@@ -1,12 +1,26 @@
 ---
 ---
 <div class="player" data-player>
+  <div class="player-search" style="display:none;">
+    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+    </svg>
+    <input type="search" data-search placeholder="Търси станции..." autocomplete="off" />
+    <span class="count" data-count></span>
+  </div>
+
   <div class="player-loading" data-status>
+    <div class="spinner"></div>
     <p>Зареждане на станции…</p>
   </div>
+
   <div class="stations" data-stations></div>
+  <div class="sentinel" data-sentinel aria-hidden="true">
+    <div class="spinner small"></div>
+  </div>
 </div>
 
+<!-- Mini bar -->
 <div class="now-playing" data-now-playing aria-live="polite">
   <div class="np-info">
     <div class="np-logo" data-np-logo></div>
@@ -15,9 +29,94 @@
       <div class="np-state" data-np-state></div>
     </div>
   </div>
-  <button class="np-btn" data-np-toggle type="button" aria-label="Пусни">
+  <button class="np-btn np-expand" data-np-expand type="button" aria-label="Отвори плейъра">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 14v6h6M20 10V4h-6M4 20l7-7M20 4l-7 7"/>
+    </svg>
+  </button>
+  <button class="np-btn np-primary" data-np-toggle type="button" aria-label="Пусни">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
   </button>
+</div>
+
+<!-- Big retro modal -->
+<div class="player-modal" data-modal role="dialog" aria-modal="true" aria-label="Плейър">
+  <div class="modal-radio">
+    <header class="modal-head">
+      <button class="modal-icon-btn" data-modal-close type="button" aria-label="Затвори">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <div class="modal-title">
+        <span class="brand-dot">❀</span>
+        РАДИО БЪЛГАРИЯ
+      </div>
+      <span class="modal-icon-btn ghost" aria-hidden="true"></span>
+    </header>
+
+    <!-- Decorative speaker grill -->
+    <div class="grill"></div>
+
+    <!-- Station logo -->
+    <div class="modal-logo-wrap">
+      <div class="modal-logo" data-modal-logo></div>
+    </div>
+
+    <!-- Frequency dial -->
+    <div class="dial">
+      <div class="dial-ticks" aria-hidden="true"></div>
+      <div class="dial-needle" aria-hidden="true"></div>
+      <div class="dial-name" data-modal-name></div>
+      <div class="dial-lang" data-modal-lang></div>
+    </div>
+
+    <!-- В ЕФИР indicator -->
+    <div class="modal-state" data-modal-state></div>
+
+    <!-- VU bars -->
+    <div class="vu-frame">
+      <div class="vu" data-modal-vu>
+        <span style="--h:30%"></span>
+        <span style="--h:55%"></span>
+        <span style="--h:40%"></span>
+        <span style="--h:75%"></span>
+        <span style="--h:60%"></span>
+        <span style="--h:85%"></span>
+        <span style="--h:50%"></span>
+        <span style="--h:70%"></span>
+        <span style="--h:35%"></span>
+      </div>
+    </div>
+
+    <!-- Tag chips -->
+    <div class="tag-chips" data-modal-tags></div>
+
+    <!-- Big play -->
+    <div class="modal-controls">
+      <button class="big-btn" data-modal-toggle type="button" aria-label="Пусни">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
+
+    <!-- Volume -->
+    <div class="volume-row">
+      <svg viewBox="0 0 24 24" fill="currentColor" class="vol-icon">
+        <path d="M3 10v4h4l5 4V6L7 10H3z"/>
+      </svg>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        data-modal-volume
+        aria-label="Сила на звука"
+      />
+      <svg viewBox="0 0 24 24" fill="currentColor" class="vol-icon">
+        <path d="M3 10v4h4l5 4V6L7 10H3zm11.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+      </svg>
+    </div>
+  </div>
 </div>
 
 <script>

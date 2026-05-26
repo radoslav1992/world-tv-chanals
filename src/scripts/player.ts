@@ -8,40 +8,112 @@ interface Station {
   bitrate: number;
   hls: number;
   country: string;
+  language: string;
 }
 
 const API = 'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/BG';
-const QUERY = '?limit=40&hidebroken=true&order=clickcount&reverse=true';
+// Pull a big batch in one shot; Radio Browser caps at ~10k per request anyway.
+const QUERY = '?limit=2000&hidebroken=true&order=clickcount&reverse=true';
 const STORAGE_KEY = 'br-last-station';
-const MAX_STATIONS = 8;
+const VOLUME_KEY = 'br-volume';
+const BATCH_SIZE = 16;
+
+type PlayState = 'playing' | 'paused' | 'loading' | 'error';
 
 class Player {
   private audio = new Audio();
+  private all: Station[] = [];
+  private filtered: Station[] = [];
+  private rendered = 0;
   private current: Station | null = null;
-  private stationsEl: HTMLElement;
+  private state: PlayState = 'paused';
+
+  // Player section refs
   private statusEl: HTMLElement;
+  private stationsEl: HTMLElement;
+  private searchEl: HTMLInputElement;
+  private countEl: HTMLElement;
+  private sentinelEl: HTMLElement;
+  private stationCards = new Map<string, HTMLElement>();
+  private observer: IntersectionObserver | null = null;
+
+  // Mini bar refs
   private nowPlaying: HTMLElement;
   private npLogo: HTMLElement;
   private npName: HTMLElement;
   private npState: HTMLElement;
   private npToggle: HTMLButtonElement;
-  private stationCards = new Map<string, HTMLElement>();
+  private npExpand: HTMLButtonElement;
+
+  // Modal refs
+  private modal: HTMLElement;
+  private modalLogo: HTMLElement;
+  private modalName: HTMLElement;
+  private modalLang: HTMLElement;
+  private modalState: HTMLElement;
+  private modalTags: HTMLElement;
+  private modalToggle: HTMLButtonElement;
+  private modalVolume: HTMLInputElement;
+  private modalClose: HTMLButtonElement;
+  private modalVu: HTMLElement;
 
   constructor(root: HTMLElement) {
-    this.stationsEl = root.querySelector<HTMLElement>('[data-stations]')!;
     this.statusEl = root.querySelector<HTMLElement>('[data-status]')!;
+    this.stationsEl = root.querySelector<HTMLElement>('[data-stations]')!;
+    this.searchEl = root.querySelector<HTMLInputElement>('[data-search]')!;
+    this.countEl = root.querySelector<HTMLElement>('[data-count]')!;
+    this.sentinelEl = root.querySelector<HTMLElement>('[data-sentinel]')!;
+
     this.nowPlaying = document.querySelector<HTMLElement>('[data-now-playing]')!;
     this.npLogo = this.nowPlaying.querySelector<HTMLElement>('[data-np-logo]')!;
     this.npName = this.nowPlaying.querySelector<HTMLElement>('[data-np-name]')!;
     this.npState = this.nowPlaying.querySelector<HTMLElement>('[data-np-state]')!;
     this.npToggle = this.nowPlaying.querySelector<HTMLButtonElement>('[data-np-toggle]')!;
+    this.npExpand = this.nowPlaying.querySelector<HTMLButtonElement>('[data-np-expand]')!;
+
+    this.modal = document.querySelector<HTMLElement>('[data-modal]')!;
+    this.modalLogo = this.modal.querySelector<HTMLElement>('[data-modal-logo]')!;
+    this.modalName = this.modal.querySelector<HTMLElement>('[data-modal-name]')!;
+    this.modalLang = this.modal.querySelector<HTMLElement>('[data-modal-lang]')!;
+    this.modalState = this.modal.querySelector<HTMLElement>('[data-modal-state]')!;
+    this.modalTags = this.modal.querySelector<HTMLElement>('[data-modal-tags]')!;
+    this.modalToggle = this.modal.querySelector<HTMLButtonElement>('[data-modal-toggle]')!;
+    this.modalVolume = this.modal.querySelector<HTMLInputElement>('[data-modal-volume]')!;
+    this.modalClose = this.modal.querySelector<HTMLButtonElement>('[data-modal-close]')!;
+    this.modalVu = this.modal.querySelector<HTMLElement>('[data-modal-vu]')!;
 
     this.audio.preload = 'none';
-    this.audio.addEventListener('playing', () => this.renderState('playing'));
-    this.audio.addEventListener('pause', () => this.renderState('paused'));
-    this.audio.addEventListener('waiting', () => this.renderState('loading'));
-    this.audio.addEventListener('error', () => this.renderState('error'));
-    this.npToggle.addEventListener('click', () => this.toggle());
+    const savedVol = parseFloat(localStorage.getItem(VOLUME_KEY) || '0.8');
+    this.audio.volume = isNaN(savedVol) ? 0.8 : savedVol;
+    this.modalVolume.value = String(this.audio.volume);
+
+    this.audio.addEventListener('playing', () => this.setState('playing'));
+    this.audio.addEventListener('pause', () => this.setState('paused'));
+    this.audio.addEventListener('waiting', () => this.setState('loading'));
+    this.audio.addEventListener('error', () => this.setState('error'));
+
+    this.npToggle.addEventListener('click', (e) => { e.stopPropagation(); this.toggle(); });
+    this.npExpand.addEventListener('click', () => this.openModal());
+    this.nowPlaying.addEventListener('click', (e) => {
+      if (e.target === this.nowPlaying || (e.target as HTMLElement).closest('.np-info')) {
+        this.openModal();
+      }
+    });
+    this.modalToggle.addEventListener('click', () => this.toggle());
+    this.modalClose.addEventListener('click', () => this.closeModal());
+    this.modal.addEventListener('click', (e) => {
+      if (e.target === this.modal) this.closeModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.modal.classList.contains('visible')) this.closeModal();
+    });
+    this.modalVolume.addEventListener('input', () => {
+      const v = parseFloat(this.modalVolume.value);
+      this.audio.volume = v;
+      localStorage.setItem(VOLUME_KEY, String(v));
+    });
+
+    this.searchEl.addEventListener('input', () => this.applyFilter());
   }
 
   async init() {
@@ -49,53 +121,101 @@ class Player {
       const res = await fetch(API + QUERY);
       if (!res.ok) throw new Error('API ' + res.status);
       const raw: Station[] = await res.json();
-      const playable = raw
-        .filter((s) => s.url_resolved.startsWith('https://') && s.hls === 0)
-        .slice(0, MAX_STATIONS);
-      if (playable.length === 0) {
+      this.all = raw.filter((s) => s.url_resolved.startsWith('https://') && s.hls === 0);
+      if (this.all.length === 0) {
         this.showError('Няма налични станции за уеб възпроизвеждане.');
         return;
       }
-      this.renderStations(playable);
+      this.statusEl.style.display = 'none';
+      this.searchEl.parentElement!.style.display = '';
+      this.applyFilter();
+      this.setupInfiniteScroll();
     } catch (err) {
       console.error(err);
       this.showError('Не успяхме да заредим станциите.');
     }
   }
 
-  private renderStations(stations: Station[]) {
-    this.statusEl.style.display = 'none';
+  private applyFilter() {
+    const q = this.searchEl.value.trim().toLowerCase();
+    this.filtered = q
+      ? this.all.filter((s) =>
+          s.name.toLowerCase().includes(q) || s.tags.toLowerCase().includes(q)
+        )
+      : this.all;
+    this.rendered = 0;
     this.stationsEl.innerHTML = '';
+    this.stationCards.clear();
+    this.updateCount();
+    this.renderNextBatch();
+  }
+
+  private updateCount() {
+    const total = this.all.length;
+    const shown = this.filtered.length;
+    this.countEl.textContent =
+      shown === total
+        ? `${total} станции`
+        : `${shown} от ${total} станции`;
+  }
+
+  private renderNextBatch() {
+    const next = this.filtered.slice(this.rendered, this.rendered + BATCH_SIZE);
+    const frag = document.createDocumentFragment();
     const lastId = localStorage.getItem(STORAGE_KEY);
-
-    for (const s of stations) {
-      const card = document.createElement('button');
-      card.className = 'station';
-      card.type = 'button';
-      const tag = (s.tags.split(',')[0] || s.codec || '').trim();
-      const initial = s.name.charAt(0).toUpperCase();
-      card.innerHTML = `
-        <div class="station-logo">${
-          s.favicon
-            ? `<img src="${escapeAttr(s.favicon)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'fallback',textContent:'${initial}'}))" />`
-            : `<span class="fallback">${initial}</span>`
-        }</div>
-        <p class="station-name">${escapeHtml(s.name)}</p>
-        <span class="station-tag">${escapeHtml(tag)}</span>
-      `;
-      card.addEventListener('click', () => this.play(s));
+    for (const s of next) {
+      const card = this.makeStationCard(s);
       this.stationCards.set(s.stationuuid, card);
-      this.stationsEl.appendChild(card);
-
-      if (s.stationuuid === lastId) {
+      frag.appendChild(card);
+      if (s.stationuuid === lastId && !this.current) {
         this.current = s;
         this.showNowPlaying(s, 'paused');
       }
     }
+    this.stationsEl.appendChild(frag);
+    this.rendered += next.length;
+    this.sentinelEl.style.display = this.rendered < this.filtered.length ? '' : 'none';
+    if (this.current && this.state === 'playing') {
+      this.updateActiveCard(this.current.stationuuid);
+    }
+  }
+
+  private setupInfiniteScroll() {
+    if (this.observer) this.observer.disconnect();
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          if (e.isIntersecting && this.rendered < this.filtered.length) {
+            this.renderNextBatch();
+          }
+        }
+      },
+      { rootMargin: '400px 0px' }
+    );
+    this.observer.observe(this.sentinelEl);
+  }
+
+  private makeStationCard(s: Station): HTMLElement {
+    const card = document.createElement('button');
+    card.className = 'station';
+    card.type = 'button';
+    const tag = (s.tags.split(',')[0] || s.codec || '').trim();
+    const initial = s.name.charAt(0).toUpperCase();
+    card.innerHTML = `
+      <div class="station-logo">${
+        s.favicon
+          ? `<img src="${escapeAttr(s.favicon)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'fallback',textContent:'${initial}'}))" />`
+          : `<span class="fallback">${initial}</span>`
+      }</div>
+      <p class="station-name">${escapeHtml(s.name)}</p>
+      ${tag ? `<span class="station-tag">${escapeHtml(tag)}</span>` : ''}
+    `;
+    card.addEventListener('click', () => this.play(s));
+    return card;
   }
 
   private showError(msg: string) {
-    this.statusEl.innerHTML = `<p>${escapeHtml(msg)} <br>Свалете приложението за пълно изживяване.</p>`;
+    this.statusEl.innerHTML = `<p>${escapeHtml(msg)}<br>Свалете приложението за пълно изживяване.</p>`;
   }
 
   private play(s: Station) {
@@ -105,7 +225,7 @@ class Player {
     }
     this.current = s;
     this.audio.src = s.url_resolved;
-    void this.audio.play().catch(() => this.renderState('error'));
+    void this.audio.play().catch(() => this.setState('error'));
     this.showNowPlaying(s, 'loading');
     this.updateActiveCard(s.stationuuid);
     localStorage.setItem(STORAGE_KEY, s.stationuuid);
@@ -115,23 +235,51 @@ class Player {
     if (!this.current) return;
     if (this.audio.paused) {
       if (!this.audio.src) this.audio.src = this.current.url_resolved;
-      void this.audio.play().catch(() => this.renderState('error'));
+      void this.audio.play().catch(() => this.setState('error'));
     } else {
       this.audio.pause();
     }
   }
 
+  private openModal() {
+    if (!this.current) return;
+    this.modal.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+
+  private closeModal() {
+    this.modal.classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
   private showNowPlaying(s: Station, state: PlayState) {
     this.nowPlaying.classList.add('visible');
     const initial = s.name.charAt(0).toUpperCase();
-    this.npLogo.innerHTML = s.favicon
-      ? `<img src="${escapeAttr(s.favicon)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'fallback',textContent:'${initial}'}))" />`
+    const logoHtml = s.favicon
+      ? `<img src="${escapeAttr(s.favicon)}" alt="" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'fallback',textContent:'${initial}'}))" />`
       : `<span class="fallback">${initial}</span>`;
+    this.npLogo.innerHTML = logoHtml;
     this.npName.textContent = s.name;
-    this.renderState(state);
+    this.modalLogo.innerHTML = logoHtml;
+    this.modalName.textContent = s.name;
+    this.modalLang.textContent = s.language || s.country || '';
+    this.renderTags(s);
+    this.setState(state);
   }
 
-  private renderState(state: PlayState) {
+  private renderTags(s: Station) {
+    const tags = (s.tags || '')
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .slice(0, 3);
+    this.modalTags.innerHTML = tags
+      .map((t) => `<span class="tag-chip">${escapeHtml(t.toUpperCase())}</span>`)
+      .join('');
+  }
+
+  private setState(state: PlayState) {
+    this.state = state;
     const label =
       state === 'playing'
         ? 'В ЕФИР'
@@ -139,10 +287,16 @@ class Player {
           ? 'Зареждане…'
           : state === 'error'
             ? 'Грешка'
-            : 'Пауза';
-    this.npState.innerHTML = `<span class="dot"></span>${label}`;
-    this.npToggle.innerHTML = state === 'playing' ? ICON_PAUSE : ICON_PLAY;
-    this.npToggle.setAttribute('aria-label', state === 'playing' ? 'Пауза' : 'Пусни');
+            : 'ПАУЗА';
+    this.npState.innerHTML = `<span class="dot ${state}"></span>${label}`;
+    this.modalState.innerHTML = `<span class="dot ${state}"></span>${label}`;
+    const icon = state === 'playing' ? ICON_PAUSE : ICON_PLAY;
+    this.npToggle.innerHTML = icon;
+    this.modalToggle.innerHTML = icon;
+    const ariaLabel = state === 'playing' ? 'Пауза' : 'Пусни';
+    this.npToggle.setAttribute('aria-label', ariaLabel);
+    this.modalToggle.setAttribute('aria-label', ariaLabel);
+    this.modalVu.classList.toggle('animating', state === 'playing');
     if (this.current) {
       const isActive = !this.audio.paused;
       this.updateActiveCard(isActive ? this.current.stationuuid : null);
@@ -155,8 +309,6 @@ class Player {
     }
   }
 }
-
-type PlayState = 'playing' | 'paused' | 'loading' | 'error';
 
 const ICON_PLAY =
   '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
