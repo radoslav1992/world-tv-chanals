@@ -1,0 +1,8 @@
+# Authorized digital sellers (ads.txt) for radio-bulgaria.app
+#
+# After AdSense approval, replace the line below with your real publisher line:
+#   google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0
+#
+# Find your line in AdSense → Sites → ads.txt status.
+
+# google.com, pub-XXXXXXXXXXXXXXXX, DIRECT, f08c47fec0942fa0

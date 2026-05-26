@@ -4,15 +4,36 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description?: string;
+  /** Path-relative or absolute image URL for Open Graph + Twitter. */
+  ogImage?: string;
+  /** Canonical path (defaults to current pathname). Useful to dedupe with/without trailing slash. */
+  canonicalPath?: string;
+  /** Page type for OpenGraph (default 'website'). */
+  ogType?: 'website' | 'article';
+  /** Optional JSON-LD structured-data object(s) to inject into <head>. */
+  jsonLd?: object | object[];
 }
+
+const SITE_URL = 'https://radio-bulgaria.app'; // PLACEHOLDER: replace with your real domain
+const SITE_NAME = 'Радио България';
+const DEFAULT_DESC = 'Слушай безплатно над 100 български радио станции онлайн — поп, рок, фолк, дип хаус и още. Достъпно като Android приложение и директно в браузъра.';
 
 const {
   title,
-  description = 'Слушай любимите си български радио станции навсякъде. Безплатно Android приложение.',
+  description = DEFAULT_DESC,
+  ogImage = '/logo.jpeg',
+  canonicalPath,
+  ogType = 'website',
+  jsonLd,
 } = Astro.props;
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const isActive = (href: string) => (href === '/' ? path === '/' : path === href);
+
+const canonical = new URL(canonicalPath ?? path, SITE_URL).toString();
+const ogImageAbs = ogImage.startsWith('http') ? ogImage : new URL(ogImage, SITE_URL).toString();
+
+const jsonLdArr = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 <!doctype html>
 <html lang="bg">
@@ -20,50 +41,165 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href)
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <meta name="theme-color" content="#1f120a" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="format-detection" content="telephone=no" />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageAbs} />
+    <meta property="og:locale" content="bg_BG" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageAbs} />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/logo.jpeg" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://de1.api.radio-browser.info" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap"
       rel="stylesheet"
     />
+
+    {jsonLdArr.map((obj) => (
+      <script type="application/ld+json" set:html={JSON.stringify(obj)} />
+    ))}
+
+    {/*
+      AdSense — uncomment after approval and replace ca-pub-XXXXXXXXXXXXXXXX
+      with your real publisher ID. The slots in the page templates will start
+      filling automatically.
+
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+    */}
+
     <title>{title}</title>
   </head>
   <body>
+    <a href="#main" class="skip-link">Към основното съдържание</a>
+
     <div class="flag-bar"><div class="w"></div><div class="g"></div><div class="r"></div></div>
 
     <header class="site">
       <div class="container row">
         <a class="brand" href="/">
-          <img src="/logo.jpeg" alt="Радио България" />
-          <h1>Радио България</h1>
+          <img src="/logo.jpeg" alt="" width="40" height="40" />
+          <span class="brand-name">Радио България</span>
         </a>
-        <nav class="site">
+        <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="main-nav">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="site" id="main-nav">
           <a href="/" class:list={{ active: isActive('/') }}>Слушай</a>
           <a href="/favorites" class:list={{ active: isActive('/favorites') }}>Любими</a>
           <a href="/history" class:list={{ active: isActive('/history') }}>История</a>
-          <a href="/privacy-policy" class:list={{ active: isActive('/privacy-policy') }}>Поверителност</a>
-          <a href="/terms" class:list={{ active: isActive('/terms') }}>Условия</a>
+          <a href="/about" class:list={{ active: isActive('/about') }}>За нас</a>
+          <a href="/contact" class:list={{ active: isActive('/contact') }}>Контакт</a>
         </nav>
       </div>
     </header>
 
-    <main>
+    <main id="main">
       <slot />
     </main>
 
     <footer class="site">
-      <div class="container row">
-        <div>© 2026 Радио България</div>
-        <div>
-          <a href="/privacy-policy">Политика за поверителност</a>
-          <a href="/terms">Условия за ползване</a>
-          <!-- PLACEHOLDER: replace YOUR_EMAIL@example.com with your real contact email -->
-          <a href="mailto:YOUR_EMAIL@example.com">Контакт</a>
+      <div class="container footer-grid">
+        <div class="footer-col footer-brand">
+          <div class="brand">
+            <img src="/logo.jpeg" alt="" width="36" height="36" />
+            <span>Радио България</span>
+          </div>
+          <p>Безплатен достъп до български радио станции — на Android и в браузъра.</p>
         </div>
+        <div class="footer-col">
+          <h4>Приложение</h4>
+          <a href="/">Слушай онлайн</a>
+          <a href="/favorites">Любими</a>
+          <a href="/history">История</a>
+        </div>
+        <div class="footer-col">
+          <h4>Информация</h4>
+          <a href="/about">За нас</a>
+          <a href="/contact">Контакт</a>
+          <a href="/sitemap.xml">Карта на сайта</a>
+        </div>
+        <div class="footer-col">
+          <h4>Правни</h4>
+          <a href="/privacy-policy">Поверителност</a>
+          <a href="/terms">Условия</a>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <span>© 2026 Радио България. Всички права запазени.</span>
+        <span class="footer-credit">Станциите се предоставят от <a href="https://www.radio-browser.info" target="_blank" rel="noopener">Radio Browser</a>.</span>
       </div>
     </footer>
 
-    <div class="flag-bar"><div class="w"></div><div class="g"></div><div class="r"></div></div>
+    <div class="flag-bar bottom"><div class="w"></div><div class="g"></div><div class="r"></div></div>
+
+    <!-- Cookie consent banner -->
+    <div class="consent" data-consent hidden>
+      <div class="consent-inner container">
+        <div class="consent-text">
+          <strong>Този сайт използва бисквитки</strong>
+          <p>
+            Използваме само технически необходими бисквитки, за да запомним избора ви
+            (плейър, любими, изглед). След одобрение за реклами от Google AdSense ще
+            бъдат добавени и бисквитки на трети страни — повече в
+            <a href="/privacy-policy">Политиката за поверителност</a>.
+          </p>
+        </div>
+        <div class="consent-actions">
+          <button type="button" class="cta-secondary" data-consent-reject>Само необходимите</button>
+          <button type="button" class="cta" data-consent-accept>Приемам</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Cookie consent: hide if a choice was already made; persist on click.
+      (() => {
+        const KEY = 'br-consent-v1';
+        const banner = document.querySelector('[data-consent]') as HTMLElement | null;
+        if (!banner) return;
+        if (localStorage.getItem(KEY)) return;
+        banner.hidden = false;
+        const close = (value: 'accept' | 'reject') => {
+          try { localStorage.setItem(KEY, value); } catch {}
+          banner.hidden = true;
+        };
+        banner.querySelector('[data-consent-accept]')?.addEventListener('click', () => close('accept'));
+        banner.querySelector('[data-consent-reject]')?.addEventListener('click', () => close('reject'));
+      })();
+
+      // Mobile nav toggle
+      (() => {
+        const btn = document.querySelector('.nav-toggle') as HTMLButtonElement | null;
+        const nav = document.querySelector('#main-nav') as HTMLElement | null;
+        if (!btn || !nav) return;
+        btn.addEventListener('click', () => {
+          const open = nav.classList.toggle('open');
+          btn.setAttribute('aria-expanded', String(open));
+        });
+        nav.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => {
+            nav.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      })();
+    </script>
   </body>
 </html>
