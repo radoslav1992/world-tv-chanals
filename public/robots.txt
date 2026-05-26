@@ -3,4 +3,4 @@ Allow: /
 Disallow: /favorites
 Disallow: /history
 
-Sitemap: https://bulgariaradio.com/sitemap.xml
+Sitemap: https://bulgariaradio.com/sitemap-index.xml
