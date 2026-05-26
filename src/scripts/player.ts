@@ -285,11 +285,12 @@ class Player {
       ? `<img src="${escapeAttr(s.favicon)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'fallback',textContent:'${initial}'}))" />`
       : `<span class="fallback">${initial}</span>`;
     const fav = isFavorite(s.stationuuid);
+    const votes = s.votes > 0 ? `<span class="station-votes" title="${s.votes} гласа">★ ${s.votes}</span>` : '';
     card.innerHTML = `
       <div class="station-logo">${logo}</div>
       <div class="station-meta">
         <p class="station-name">${escapeHtml(s.name)}</p>
-        ${tag ? `<span class="station-tag">${escapeHtml(tag)}</span>` : ''}
+        <span class="station-tag-row">${tag ? `<span class="station-tag">${escapeHtml(tag)}</span>` : ''}${votes}</span>
       </div>
       <button class="fav-btn ${fav ? 'active' : ''}" data-fav type="button" aria-label="${fav ? 'Премахни от любими' : 'Добави в любими'}" aria-pressed="${fav}">
         ${ICON_STAR}

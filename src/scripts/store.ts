@@ -13,6 +13,7 @@ export interface Station {
   hls: number;
   country: string;
   language: string;
+  votes: number;
 }
 
 export interface HistoryEntry {
