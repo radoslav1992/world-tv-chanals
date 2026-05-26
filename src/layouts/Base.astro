@@ -121,6 +121,7 @@ const jsonLdArr = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
           <a href="/" class:list={{ active: isActive('/') }}>Слушай</a>
           <a href="/favorites" class:list={{ active: isActive('/favorites') }}>Любими</a>
           <a href="/history" class:list={{ active: isActive('/history') }}>История</a>
+          <a href="/stations" class:list={{ active: path.startsWith('/stations') }}>Станции</a>
           <a href="/blog" class:list={{ active: path.startsWith('/blog') }}>Блог</a>
           <a href="/about" class:list={{ active: isActive('/about') }}>За нас</a>
           <a href="/contact" class:list={{ active: isActive('/contact') }}>Контакт</a>
@@ -149,6 +150,7 @@ const jsonLdArr = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
         </div>
         <div class="footer-col">
           <h4>Информация</h4>
+          <a href="/stations">Станции</a>
           <a href="/blog">Блог</a>
           <a href="/about">За нас</a>
           <a href="/contact">Контакт</a>

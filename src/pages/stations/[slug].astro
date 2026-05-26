@@ -1,0 +1,78 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const stations = await getCollection('stations');
+  return stations.map((station) => ({
+    params: { slug: station.slug },
+    props: { station },
+  }));
+}
+
+const { station } = Astro.props;
+const { Content } = await station.render();
+
+const SITE_URL = 'https://bulgariaradio.com';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'RadioStation',
+  name: station.data.name,
+  description: station.data.description,
+  ...(station.data.founded ? { foundingDate: station.data.founded } : {}),
+  ...(station.data.owner ? { parentOrganization: { '@type': 'Organization', name: station.data.owner } } : {}),
+  ...(station.data.headquarters ? { areaServed: { '@type': 'Country', name: station.data.country }, address: { '@type': 'PostalAddress', addressLocality: station.data.headquarters, addressCountry: 'BG' } } : {}),
+  ...(station.data.website ? { url: station.data.website } : {}),
+  ...(station.data.slogan ? { slogan: station.data.slogan } : {}),
+  inLanguage: station.data.language === 'български' ? 'bg' : station.data.language,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': `${SITE_URL}/stations/${station.slug}`,
+  },
+};
+---
+<Base
+  title={`${station.data.name} — информация, честоти, история`}
+  description={station.data.description}
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[
+    { label: 'Начало', href: '/' },
+    { label: 'Станции', href: '/stations' },
+    { label: station.data.name },
+  ]} />
+
+  <article class="container legal blog-post">
+    <h1>{station.data.name}</h1>
+
+    <div class="station-infobox">
+      <table>
+        {station.data.format && <tr><th>Формат</th><td>{station.data.format}</td></tr>}
+        {station.data.founded && <tr><th>Основана</th><td>{station.data.founded}</td></tr>}
+        {station.data.owner && <tr><th>Собственик</th><td>{station.data.owner}</td></tr>}
+        {station.data.headquarters && <tr><th>Седалище</th><td>{station.data.headquarters}</td></tr>}
+        {station.data.slogan && <tr><th>Слоган</th><td><em>{station.data.slogan}</em></td></tr>}
+        {station.data.frequencies.length > 0 && (
+          <tr><th>Честоти</th><td>{station.data.frequencies.join(', ')}</td></tr>
+        )}
+        {station.data.website && (
+          <tr><th>Уебсайт</th><td><a href={station.data.website} target="_blank" rel="noopener">{station.data.website.replace('https://', '')}</a></td></tr>
+        )}
+        <tr><th>Език</th><td>{station.data.language}</td></tr>
+        <tr><th>Страна</th><td>{station.data.country}</td></tr>
+      </table>
+    </div>
+
+    <Content />
+
+    <div class="blog-cta">
+      <p>Слушайте {station.data.name} и още над 100 станции безплатно.</p>
+      <div class="hero-ctas">
+        <a class="cta cta-secondary" href="/#player">Слушай онлайн</a>
+        <a class="cta cta-secondary" href="/stations">Всички станции</a>
+      </div>
+    </div>
+  </article>
+</Base>

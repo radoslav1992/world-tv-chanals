@@ -1581,6 +1581,54 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   margin-bottom: 0;
 }
 
+/* ------------ Station directory & infobox ------------ */
+.station-directory {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+.station-freq {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--gold-deep);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.station-infobox {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+.station-infobox table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.station-infobox th,
+.station-infobox td {
+  padding: 0.45rem 0.75rem;
+  text-align: left;
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--border);
+}
+.station-infobox tr:last-child th,
+.station-infobox tr:last-child td {
+  border-bottom: none;
+}
+.station-infobox th {
+  color: var(--text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+  width: 1%;
+}
+.station-infobox td {
+  color: var(--text);
+}
+.station-infobox a {
+  color: var(--gold);
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
