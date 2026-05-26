@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import cloudflare from "@astrojs/cloudflare";
 
 // Replace with your production domain.
-const SITE = 'https://radio-bulgaria.app';
+const SITE = 'https://bulgariaradio.com';
 
 export default defineConfig({
   site: SITE,
