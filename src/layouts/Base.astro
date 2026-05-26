@@ -84,6 +84,19 @@ const jsonLdArr = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
     */}
 
+    {/*
+      Google Analytics — uncomment and replace G-XXXXXXXXXX with your
+      Measurement ID from analytics.google.com.
+
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX');
+      </script>
+    */}
+
     <title>{title}</title>
   </head>
   <body>
@@ -104,6 +117,7 @@ const jsonLdArr = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
           <a href="/" class:list={{ active: isActive('/') }}>Слушай</a>
           <a href="/favorites" class:list={{ active: isActive('/favorites') }}>Любими</a>
           <a href="/history" class:list={{ active: isActive('/history') }}>История</a>
+          <a href="/blog" class:list={{ active: path.startsWith('/blog') }}>Блог</a>
           <a href="/about" class:list={{ active: isActive('/about') }}>За нас</a>
           <a href="/contact" class:list={{ active: isActive('/contact') }}>Контакт</a>
         </nav>
@@ -131,6 +145,7 @@ const jsonLdArr = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
         </div>
         <div class="footer-col">
           <h4>Информация</h4>
+          <a href="/blog">Блог</a>
           <a href="/about">За нас</a>
           <a href="/contact">Контакт</a>
           <a href="/sitemap.xml">Карта на сайта</a>

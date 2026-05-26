@@ -3,5 +3,4 @@ Allow: /
 Disallow: /favorites
 Disallow: /history
 
-# PLACEHOLDER: replace with your real domain
 Sitemap: https://radio-bulgaria.app/sitemap.xml

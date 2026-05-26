@@ -1,0 +1,63 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+
+const posts = (await getCollection('blog'))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: 'Блог — Радио България',
+  description: 'Статии за българското радио, музика и интернет стрийминг.',
+  inLanguage: 'bg',
+  blogPost: posts.map((p) => ({
+    '@type': 'BlogPosting',
+    headline: p.data.title,
+    description: p.data.description,
+    datePublished: p.data.date,
+    author: { '@type': 'Person', name: p.data.author },
+  })),
+};
+---
+<Base
+  title="Блог — Радио България"
+  description="Статии за българското радио, музикалната сцена, интернет стрийминг и съвети за слушатели."
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[
+    { label: 'Начало', href: '/' },
+    { label: 'Блог' },
+  ]} />
+
+  <section class="container blog-index">
+    <div class="section-head">
+      <h1>Блог</h1>
+      <p>Статии за българското радио, музика и полезни съвети за слушатели.</p>
+    </div>
+
+    <div class="blog-grid">
+      {posts.map((post) => (
+        <a href={`/blog/${post.slug}`} class="blog-card">
+          <div class="blog-card-body">
+            <div class="blog-card-tags">
+              {post.data.tags.map((tag) => (
+                <span class="tag-chip">{tag}</span>
+              ))}
+            </div>
+            <h2>{post.data.title}</h2>
+            <p>{post.data.description}</p>
+            <time datetime={post.data.date}>
+              {new Date(post.data.date).toLocaleDateString('bg-BG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </time>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,36 @@
+---
+interface Crumb {
+  label: string;
+  href?: string;
+}
+interface Props {
+  crumbs: Crumb[];
+}
+const { crumbs } = Astro.props;
+
+const SITE_URL = 'https://radio-bulgaria.app';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: crumbs.map((c, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: c.label,
+    ...(c.href ? { item: new URL(c.href, SITE_URL).toString() } : {}),
+  })),
+};
+---
+<nav class="breadcrumbs container" aria-label="Навигация">
+  <ol>
+    {crumbs.map((c, i) => (
+      <li>
+        {c.href
+          ? <a href={c.href}>{c.label}</a>
+          : <span aria-current="page">{c.label}</span>}
+        {i < crumbs.length - 1 && <span class="sep" aria-hidden="true">/</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

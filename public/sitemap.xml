@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Static sitemap. Update <lastmod> when pages change substantively.
-  PLACEHOLDER: replace radio-bulgaria.app with your real domain.
--->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://radio-bulgaria.app/</loc>
@@ -11,10 +7,76 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://radio-bulgaria.app/blog</loc>
+    <lastmod>2026-05-26</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/istoria-na-radioto-v-bulgaria</loc>
+    <lastmod>2026-04-10</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/top-10-balgarski-radio-stancii</loc>
+    <lastmod>2026-04-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/kak-raboti-internet-radioto</loc>
+    <lastmod>2026-04-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/balgarska-pop-muzika-90te-do-dnes</loc>
+    <lastmod>2026-05-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/nai-dobrite-stancii-za-folk</loc>
+    <lastmod>2026-05-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/kak-da-slushate-radio-ot-chuzhbina</loc>
+    <lastmod>2026-05-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/razlikata-mezhdu-fm-i-internet-radio</loc>
+    <lastmod>2026-05-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/radio-za-deca-obrazovatelni-stancii</loc>
+    <lastmod>2026-05-18</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/zashto-radioto-ostava-aktualno</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://radio-bulgaria.app/blog/retro-radio-muzika-80te-90te</loc>
+    <lastmod>2026-05-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://radio-bulgaria.app/about</loc>
     <lastmod>2026-05-26</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://radio-bulgaria.app/contact</loc>

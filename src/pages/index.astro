@@ -1,13 +1,16 @@
 ---
-// PLACEHOLDERS to fill in before publishing:
-//   PLAY_STORE_URL_HERE    — your Google Play listing URL
-//   YOUR_EMAIL@example.com — your contact email (see Base.astro footer)
+// PLACEHOLDER: replace with your Google Play listing URL when published
 import Base from '../layouts/Base.astro';
 import Feature from '../components/Feature.astro';
 import RadioPlayer from '../components/RadioPlayer.astro';
 import AdSlot from '../components/AdSlot.astro';
+import { getCollection } from 'astro:content';
 
-const PLAY_STORE_URL = 'PLAY_STORE_URL_HERE';
+const latestPosts = (await getCollection('blog'))
+  .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
+  .slice(0, 3);
+
+const PLAY_STORE_URL = '#download';
 
 const features = [
   {
@@ -70,6 +73,22 @@ const faqs = [
   {
     q: 'Достъпно ли е за iOS / iPhone?',
     a: 'В момента не — приложението е само за Android. Уеб версията на този сайт обаче работи във всеки модерен браузър, включително на iOS.',
+  },
+  {
+    q: 'Каква е разликата между FM радио и интернет радио?',
+    a: 'FM радиото използва радиочестоти и приемник, а интернет радиото предава звука като цифров поток през интернет. Онлайн стрийминг означава по-широк избор от станции, метаданни за песните и достъп от всяка точка на света.',
+  },
+  {
+    q: 'Мога ли да слушам радио без интернет?',
+    a: 'За интернет радиото е необходима интернет връзка — мобилни данни или Wi-Fi. Ако искате да слушате офлайн, единствената алтернатива засега е класическо FM радио с физически приемник.',
+  },
+  {
+    q: 'Как мога да добавя станция, която липсва?',
+    a: 'Каталогът се захранва от Radio Browser — отворена общностна база данни. Можете да предложите нова станция директно на radio-browser.info или да ни пишете през страницата за контакт с URL на потока.',
+  },
+  {
+    q: 'Безопасно ли е приложението за деца?',
+    a: 'Приложението е предназначено за потребители на 13+ години. Самото съдържание на радиостанциите е на живо и не се контролира от нас — препоръчваме родителски контрол при по-малки деца.',
   },
 ];
 
@@ -178,6 +197,31 @@ const jsonLd = [
         принадлежи на съответните радиа.
       </p>
       <p><a class="link-arrow" href="/about">Прочети повече за проекта →</a></p>
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="section-head">
+      <h2>От блога</h2>
+      <p>Статии за българското радио, музика и полезни съвети.</p>
+    </div>
+    <div class="blog-grid blog-grid-home">
+      {latestPosts.map((post) => (
+        <a href={`/blog/${post.slug}`} class="blog-card">
+          <div class="blog-card-body">
+            <div class="blog-card-tags">
+              {post.data.tags.map((tag) => (
+                <span class="tag-chip">{tag}</span>
+              ))}
+            </div>
+            <h3>{post.data.title}</h3>
+            <p>{post.data.description}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+    <div style="text-align:center; margin-top:1.5rem;">
+      <a class="link-arrow" href="/blog">Всички статии →</a>
     </div>
   </section>
 
