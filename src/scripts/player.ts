@@ -10,6 +10,7 @@ import {
 
 const API_BY_CODE = 'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/BG';
 const API_BY_NAME = 'https://de1.api.radio-browser.info/json/stations/bycountry/Bulgaria';
+const API_VOTE = 'https://de1.api.radio-browser.info/json/vote/';
 const QUERY = '?limit=2000&hidebroken=true&order=clickcount&reverse=true';
 const STORAGE_KEY = 'br-last-station';
 const VOLUME_KEY = 'br-volume';
@@ -64,6 +65,9 @@ class Player {
   private modalClose: HTMLButtonElement;
   private modalFav: HTMLButtonElement;
   private modalVu: HTMLElement;
+  private modalVote: HTMLButtonElement;
+  private modalVoteLabel: HTMLElement;
+  private modalVoteCount: HTMLElement;
 
   constructor(root: HTMLElement) {
     this.mode = (root.dataset.mode as Mode) || 'browse';
@@ -104,6 +108,9 @@ class Player {
     this.modalClose = this.modal.querySelector<HTMLButtonElement>('[data-modal-close]')!;
     this.modalFav = this.modal.querySelector<HTMLButtonElement>('[data-modal-fav]')!;
     this.modalVu = this.modal.querySelector<HTMLElement>('[data-modal-vu]')!;
+    this.modalVote = document.querySelector<HTMLButtonElement>('[data-modal-vote]')!;
+    this.modalVoteLabel = document.querySelector<HTMLElement>('[data-vote-label]')!;
+    this.modalVoteCount = document.querySelector<HTMLElement>('[data-vote-count]')!;
 
     this.audio.preload = 'none';
     const savedVol = parseFloat(localStorage.getItem(VOLUME_KEY) || '0.8');
@@ -132,6 +139,7 @@ class Player {
       if (!this.current) return;
       toggleFavorite(this.current);
     });
+    this.modalVote.addEventListener('click', () => this.vote());
     this.modal.addEventListener('click', (e) => {
       if (e.target === this.modal) this.closeModal();
     });
@@ -409,6 +417,7 @@ class Player {
     this.modalLang.textContent = s.language || s.country || '';
     this.renderTags(s);
     this.refreshFavStars();
+    this.updateVoteDisplay(s);
     this.setState(state);
   }
 
@@ -421,6 +430,35 @@ class Player {
     this.modalTags.innerHTML = tags
       .map((t) => `<span class="tag-chip">${escapeHtml(t.toUpperCase())}</span>`)
       .join('');
+  }
+
+  private updateVoteDisplay(s: Station) {
+    this.modalVoteCount.textContent = s.votes > 0 ? `★ ${s.votes}` : '';
+    this.modalVoteLabel.textContent = 'Гласувай';
+    this.modalVote.disabled = false;
+  }
+
+  private async vote() {
+    if (!this.current) return;
+    this.modalVote.disabled = true;
+    this.modalVoteLabel.textContent = '...';
+    try {
+      const res = await fetch(API_VOTE + this.current.stationuuid, { method: 'POST' });
+      const data = await res.json();
+      if (data.ok === true) {
+        this.current.votes = (this.current.votes || 0) + 1;
+        this.modalVoteCount.textContent = `★ ${this.current.votes}`;
+        this.modalVoteLabel.textContent = 'Благодаря!';
+      } else {
+        this.modalVoteLabel.textContent = data.message || 'Вече сте гласували';
+      }
+    } catch {
+      this.modalVoteLabel.textContent = 'Грешка';
+    }
+    setTimeout(() => {
+      this.modalVoteLabel.textContent = 'Гласувай';
+      this.modalVote.disabled = false;
+    }, 3000);
   }
 
   /** Sync star states on all rendered cards + modal star to localStorage truth. */

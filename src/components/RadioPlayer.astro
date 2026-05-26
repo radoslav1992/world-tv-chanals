@@ -126,6 +126,14 @@ const { mode = 'browse', showSearch = mode === 'browse' } = Astro.props;
 
     <div class="tag-chips" data-modal-tags></div>
 
+    <div class="vote-row">
+      <button class="vote-btn" data-modal-vote type="button" aria-label="Гласувай за тази станция">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        <span data-vote-label>Гласувай</span>
+      </button>
+      <span class="vote-count" data-vote-count></span>
+    </div>
+
     <div class="modal-controls">
       <button class="modal-step-btn" data-modal-prev type="button" aria-label="Предишна станция">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12l8.5 6V6z"/></svg>
