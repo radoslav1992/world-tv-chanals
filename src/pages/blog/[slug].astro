@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await post.render();
 
-const SITE_URL = 'https://radio-bulgaria.app';
+const SITE_URL = 'https://bulgariaradio.com';
 
 const jsonLd = {
   '@context': 'https://schema.org',
