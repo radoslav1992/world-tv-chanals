@@ -1,0 +1,33 @@
+---
+/**
+ * Reserved ad slot — placeholder that holds layout so AdSense ads can drop in
+ * after approval without causing CLS. To activate:
+ *   1. Replace ca-pub-XXXXXXXXXXXXXXXX in src/layouts/Base.astro with your ID
+ *      and uncomment the adsbygoogle script.
+ *   2. Replace XXXXXXXXXX below with the slot ID from your AdSense dashboard.
+ *   3. Remove the .ad-placeholder div and uncomment the <ins> tag + push script.
+ */
+interface Props {
+  /** Friendly slot label used in dev placeholder. */
+  label?: string;
+  /** Slot format hint. Affects min-height of placeholder. */
+  format?: 'horizontal' | 'square' | 'in-feed';
+  /** Replace with your real ad-slot ID after AdSense approval. */
+  slotId?: string;
+}
+const { label = 'Реклама', format = 'horizontal', slotId = 'XXXXXXXXXX' } = Astro.props;
+---
+<div class={`ad-slot ad-${format}`} data-ad-slot={slotId} role="complementary" aria-label={label}>
+  <div class="ad-placeholder">
+    <span class="ad-placeholder-label">{label}</span>
+  </div>
+  {/*
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+       data-ad-slot={slotId}
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  */}
+</div>
