@@ -10,6 +10,9 @@ const {
   title,
   description = 'Слушай любимите си български радио станции навсякъде. Безплатно Android приложение.',
 } = Astro.props;
+
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => (href === '/' ? path === '/' : path === href);
 ---
 <!doctype html>
 <html lang="bg">
@@ -36,10 +39,11 @@ const {
           <h1>Радио България</h1>
         </a>
         <nav class="site">
-          <a href="/#features">Функции</a>
-          <a href="/#download">Свали</a>
-          <a href="/privacy-policy">Поверителност</a>
-          <a href="/terms">Условия</a>
+          <a href="/" class:list={{ active: isActive('/') }}>Слушай</a>
+          <a href="/favorites" class:list={{ active: isActive('/favorites') }}>Любими</a>
+          <a href="/history" class:list={{ active: isActive('/history') }}>История</a>
+          <a href="/privacy-policy" class:list={{ active: isActive('/privacy-policy') }}>Поверителност</a>
+          <a href="/terms" class:list={{ active: isActive('/terms') }}>Условия</a>
         </nav>
       </div>
     </header>

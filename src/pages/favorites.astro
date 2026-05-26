@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro';
+import RadioPlayer from '../components/RadioPlayer.astro';
+---
+<Base title="Любими станции — Радио България" description="Запазените ви български радио станции.">
+  <section class="container page-head">
+    <h1>Любими станции</h1>
+    <p class="page-sub">Запазените ви български радио станции.</p>
+  </section>
+
+  <section class="container player-section">
+    <RadioPlayer mode="favorites" showSearch={true} />
+  </section>
+</Base>

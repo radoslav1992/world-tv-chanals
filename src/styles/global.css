@@ -99,6 +99,7 @@ nav.site a {
   transition: color 0.2s;
 }
 nav.site a:hover { color: var(--gold); }
+nav.site a.active { color: var(--gold); }
 
 h1, h2, h3 {
   font-family: var(--font-serif);
@@ -249,6 +250,18 @@ footer.site a {
 }
 footer.site a:hover { color: var(--gold); }
 
+.page-head {
+  padding: 3rem 0 1rem;
+}
+.page-head h1 {
+  font-size: 2.4rem;
+  margin-bottom: 0.4rem;
+}
+.page-sub {
+  color: var(--text-muted);
+  margin: 0;
+}
+
 .legal {
   max-width: 760px;
   padding: 3rem 0 4rem;
@@ -273,6 +286,25 @@ footer.site a:hover { color: var(--gold); }
   color: var(--text-muted);
 }
 .player-error .cta { margin-top: 1rem; }
+.empty {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 0 auto 1.25rem;
+  max-width: 380px;
+}
+.cta-secondary {
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold-deep);
+  box-shadow: none;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.95rem;
+}
+.cta-secondary:hover {
+  background: rgba(232,201,130,0.08);
+  filter: none;
+  box-shadow: none;
+}
 
 .spinner {
   width: 28px;
@@ -423,6 +455,25 @@ footer.site a:hover { color: var(--gold); }
   justify-content: center;
 }
 
+/* Favorite star button on each card */
+.fav-btn {
+  background: transparent;
+  border: none;
+  color: #4a3624;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: color 0.15s, background 0.15s, transform 0.1s;
+}
+.fav-btn:hover { color: var(--gold); background: rgba(232,201,130,0.08); }
+.fav-btn:active { transform: scale(0.9); }
+.fav-btn.active { color: var(--gold); }
+.fav-btn svg { width: 18px; height: 18px; }
+
 /* List view: horizontal row, dense */
 .stations.view-list .station {
   align-items: center;
@@ -452,6 +503,7 @@ footer.site a:hover { color: var(--gold); }
   font-size: 0.65rem;
   flex-shrink: 0;
 }
+.stations.view-list .fav-btn { margin-left: auto; }
 
 /* Grid view: compact card */
 .stations.view-grid .station {
@@ -484,6 +536,14 @@ footer.site a:hover { color: var(--gold); }
   font-size: 0.6rem;
   margin-top: 2px;
 }
+.stations.view-grid .station { position: relative; }
+.stations.view-grid .fav-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 4px;
+}
+.stations.view-grid .fav-btn svg { width: 14px; height: 14px; }
 
 .sentinel {
   padding: 1.5rem 0;
@@ -596,6 +656,20 @@ footer.site a:hover { color: var(--gold); }
   color: var(--text-muted);
 }
 .np-btn.np-expand:hover { color: var(--gold); border-color: var(--gold); }
+.np-btn.np-secondary {
+  width: 38px;
+  height: 38px;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+}
+.np-btn.np-secondary:hover { color: var(--gold); }
+.np-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(0.6);
+}
+.np-btn.np-secondary svg { width: 18px; height: 18px; }
 
 /* ------------ Big retro modal ------------ */
 .player-modal {
@@ -658,6 +732,8 @@ footer.site a:hover { color: var(--gold); }
 .modal-icon-btn.ghost { cursor: default; }
 .modal-icon-btn:not(.ghost):hover { background: rgba(232,201,130,0.1); color: var(--gold); }
 .modal-icon-btn svg { width: 20px; height: 20px; }
+.modal-icon-btn.fav-modal { color: #6b4a2c; }
+.modal-icon-btn.fav-modal.active { color: var(--gold); }
 .modal-title {
   font-family: var(--font-serif);
   font-size: 0.85rem;
@@ -848,9 +924,28 @@ footer.site a:hover { color: var(--gold); }
 
 .modal-controls {
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 1.5rem;
   margin-bottom: 1.25rem;
 }
+.modal-step-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s, transform 0.1s;
+}
+.modal-step-btn:hover { color: var(--gold); border-color: var(--gold); }
+.modal-step-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.modal-step-btn:active:not(:disabled) { transform: scale(0.94); }
+.modal-step-btn svg { width: 22px; height: 22px; }
 .big-btn {
   width: 72px;
   height: 72px;
