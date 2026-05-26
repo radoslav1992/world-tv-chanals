@@ -16,7 +16,10 @@ const API = 'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact
 const QUERY = '?limit=2000&hidebroken=true&order=clickcount&reverse=true';
 const STORAGE_KEY = 'br-last-station';
 const VOLUME_KEY = 'br-volume';
-const BATCH_SIZE = 16;
+const VIEW_KEY = 'br-view';
+const BATCH_SIZE = 24;
+
+type View = 'list' | 'grid';
 
 type PlayState = 'playing' | 'paused' | 'loading' | 'error';
 
@@ -34,6 +37,8 @@ class Player {
   private searchEl: HTMLInputElement;
   private countEl: HTMLElement;
   private sentinelEl: HTMLElement;
+  private viewButtons: NodeListOf<HTMLButtonElement>;
+  private view: View = 'list';
   private stationCards = new Map<string, HTMLElement>();
   private observer: IntersectionObserver | null = null;
 
@@ -63,6 +68,15 @@ class Player {
     this.searchEl = root.querySelector<HTMLInputElement>('[data-search]')!;
     this.countEl = root.querySelector<HTMLElement>('[data-count]')!;
     this.sentinelEl = root.querySelector<HTMLElement>('[data-sentinel]')!;
+    this.viewButtons = root.querySelectorAll<HTMLButtonElement>('.vt-btn');
+
+    const savedView = localStorage.getItem(VIEW_KEY) as View | null;
+    this.view = savedView === 'grid' ? 'grid' : 'list';
+    this.stationsEl.classList.add(`view-${this.view}`);
+    this.viewButtons.forEach((b) => {
+      b.classList.toggle('active', b.dataset.view === this.view);
+      b.addEventListener('click', () => this.setView(b.dataset.view as View));
+    });
 
     this.nowPlaying = document.querySelector<HTMLElement>('[data-now-playing]')!;
     this.npLogo = this.nowPlaying.querySelector<HTMLElement>('[data-np-logo]')!;
@@ -127,7 +141,8 @@ class Player {
         return;
       }
       this.statusEl.style.display = 'none';
-      this.searchEl.parentElement!.style.display = '';
+      const toolbar = document.querySelector<HTMLElement>('.player-toolbar');
+      if (toolbar) toolbar.style.display = '';
       this.applyFilter();
       this.setupInfiniteScroll();
     } catch (err) {
@@ -201,17 +216,28 @@ class Player {
     card.type = 'button';
     const tag = (s.tags.split(',')[0] || s.codec || '').trim();
     const initial = s.name.charAt(0).toUpperCase();
+    const logo = s.favicon
+      ? `<img src="${escapeAttr(s.favicon)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'fallback',textContent:'${initial}'}))" />`
+      : `<span class="fallback">${initial}</span>`;
     card.innerHTML = `
-      <div class="station-logo">${
-        s.favicon
-          ? `<img src="${escapeAttr(s.favicon)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'fallback',textContent:'${initial}'}))" />`
-          : `<span class="fallback">${initial}</span>`
-      }</div>
-      <p class="station-name">${escapeHtml(s.name)}</p>
-      ${tag ? `<span class="station-tag">${escapeHtml(tag)}</span>` : ''}
+      <div class="station-logo">${logo}</div>
+      <div class="station-meta">
+        <p class="station-name">${escapeHtml(s.name)}</p>
+        ${tag ? `<span class="station-tag">${escapeHtml(tag)}</span>` : ''}
+      </div>
     `;
     card.addEventListener('click', () => this.play(s));
     return card;
+  }
+
+  private setView(view: View) {
+    if (view !== 'list' && view !== 'grid') return;
+    if (view === this.view) return;
+    this.view = view;
+    localStorage.setItem(VIEW_KEY, view);
+    this.stationsEl.classList.remove('view-list', 'view-grid');
+    this.stationsEl.classList.add(`view-${view}`);
+    this.viewButtons.forEach((b) => b.classList.toggle('active', b.dataset.view === view));
   }
 
   private showError(msg: string) {
