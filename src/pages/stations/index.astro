@@ -1,0 +1,51 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+
+const stations = (await getCollection('stations'))
+  .sort((a, b) => a.data.name.localeCompare(b.data.name, 'bg'));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Български радио станции — справочник',
+  description: 'Справочник на българските радио станции — история, формат, честоти и полезна информация.',
+  inLanguage: 'bg',
+};
+---
+<Base
+  title="Български радио станции — справочник"
+  description="Подробен справочник на българските радио станции — история, собственост, формат, честоти и програма."
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[
+    { label: 'Начало', href: '/' },
+    { label: 'Станции' },
+  ]} />
+
+  <section class="container blog-index">
+    <div class="section-head">
+      <h1>Български радио станции</h1>
+      <p>Подробен справочник с информация за българските радио станции — история, формат, честоти и програма.</p>
+    </div>
+
+    <div class="station-directory">
+      {stations.map((station) => (
+        <a href={`/stations/${station.slug}`} class="blog-card">
+          <div class="blog-card-body">
+            <div class="blog-card-tags">
+              <span class="tag-chip">{station.data.format}</span>
+              {station.data.founded && <span class="tag-chip">от {station.data.founded}</span>}
+            </div>
+            <h2>{station.data.name}</h2>
+            <p>{station.data.description}</p>
+            {station.data.frequencies.length > 0 && (
+              <p class="station-freq">{station.data.frequencies.join(' · ')}</p>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

@@ -12,4 +12,21 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+const stations = defineCollection({
+  type: 'content',
+  schema: z.object({
+    name: z.string(),
+    description: z.string(),
+    founded: z.string().optional(),
+    owner: z.string().optional(),
+    headquarters: z.string().optional(),
+    format: z.string(),
+    frequencies: z.array(z.string()).default([]),
+    website: z.string().optional(),
+    language: z.string().default('български'),
+    country: z.string().default('България'),
+    slogan: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, stations };

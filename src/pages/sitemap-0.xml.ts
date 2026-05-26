@@ -6,6 +6,7 @@ const SITE = 'https://bulgariaradio.com';
 
 const staticPages = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
+  { loc: '/stations', changefreq: 'weekly', priority: '0.9' },
   { loc: '/blog', changefreq: 'weekly', priority: '0.9' },
   { loc: '/about', changefreq: 'monthly', priority: '0.7' },
   { loc: '/contact', changefreq: 'monthly', priority: '0.7' },
@@ -14,7 +15,10 @@ const staticPages = [
 ];
 
 export async function GET() {
-  const posts = await getCollection('blog');
+  const [posts, stations] = await Promise.all([
+    getCollection('blog'),
+    getCollection('stations'),
+  ]);
 
   const blogEntries = posts
     .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
@@ -25,8 +29,18 @@ export async function GET() {
       priority: '0.8',
     }));
 
+  const stationEntries = stations
+    .sort((a, b) => a.data.name.localeCompare(b.data.name, 'bg'))
+    .map((s) => ({
+      loc: `/stations/${s.slug}`,
+      lastmod: new Date().toISOString().split('T')[0],
+      changefreq: 'monthly',
+      priority: '0.8',
+    }));
+
   const allEntries = [
     ...staticPages.map((p) => ({ ...p, lastmod: new Date().toISOString().split('T')[0] })),
+    ...stationEntries,
     ...blogEntries,
   ];
 
