@@ -45,6 +45,8 @@ const jsonLd = {
   description={post.data.description}
   ogType="article"
   jsonLd={jsonLd}
+  publishedTime={post.data.date}
+  articleAuthor={post.data.author}
 >
   <Breadcrumbs crumbs={[
     { label: 'Начало', href: '/' },
