@@ -8,10 +8,8 @@ import {
   toggleFavorite,
 } from './store';
 
-const API_BY_CODE = 'https://de1.api.radio-browser.info/json/stations/bycountrycodeexact/BG';
-const API_BY_NAME = 'https://de1.api.radio-browser.info/json/stations/bycountry/Bulgaria';
-const API_VOTE = 'https://de1.api.radio-browser.info/json/vote/';
-const QUERY = '?limit=2000&hidebroken=true&order=clickcount&reverse=true';
+const API_STATIONS = '/api/stations';
+const API_VOTE = '/api/vote';
 const STORAGE_KEY = 'br-last-station';
 const VOLUME_KEY = 'br-volume';
 const VIEW_KEY = 'br-view';
@@ -165,24 +163,9 @@ class Player {
   async init() {
     try {
       if (this.mode === 'browse') {
-        const [r1, r2] = await Promise.all([
-          fetch(API_BY_CODE + QUERY),
-          fetch(API_BY_NAME + QUERY).catch(() => null),
-        ]);
-        if (!r1.ok) throw new Error('API ' + r1.status);
-        const raw1: Station[] = await r1.json();
-        const raw2: Station[] = r2 && r2.ok ? await r2.json() : [];
-        const seenUuid = new Set(raw1.map((s) => s.stationuuid));
-        const merged = [...raw1, ...raw2.filter((s) => !seenUuid.has(s.stationuuid))];
-        const seenName = new Set<string>();
-        const deduped: Station[] = [];
-        for (const s of merged) {
-          const key = s.name.trim().toLowerCase();
-          if (seenName.has(key)) continue;
-          seenName.add(key);
-          deduped.push(s);
-        }
-        this.all = deduped.filter((s) => s.url_resolved.startsWith('https://'));
+        const res = await fetch(API_STATIONS);
+        if (!res.ok) throw new Error('API ' + res.status);
+        this.all = await res.json();
       } else if (this.mode === 'favorites') {
         this.all = getFavorites();
       } else if (this.mode === 'history') {
@@ -443,7 +426,11 @@ class Player {
     this.modalVote.disabled = true;
     this.modalVoteLabel.textContent = '...';
     try {
-      const res = await fetch(API_VOTE + this.current.stationuuid, { method: 'POST' });
+      const res = await fetch(API_VOTE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uuid: this.current.stationuuid }),
+      });
       const data = await res.json();
       if (data.ok === true) {
         this.current.votes = (this.current.votes || 0) + 1;
