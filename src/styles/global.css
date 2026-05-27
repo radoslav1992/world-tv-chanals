@@ -329,6 +329,36 @@ footer.site .footer-credit a:hover { color: var(--gold); }
 .legal ul { padding-left: 1.25rem; }
 .legal a { color: var(--gold); }
 
+/* ------------ Genre filters ------------ */
+.genre-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0.75rem 0;
+}
+.genre-pill {
+  padding: 0.35rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.genre-pill:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.genre-pill.active {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #ffffff;
+}
+
 /* ------------ Player ------------ */
 .player {
   background: var(--bg-card);
@@ -692,6 +722,14 @@ footer.site .footer-credit a:hover { color: var(--gold); }
   gap: 0.4rem;
   letter-spacing: 0.04em;
 }
+.now-playing .np-song {
+  font-size: 0.75rem;
+  color: var(--gold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 1em;
+}
 .np-state .dot {
   width: 8px;
   height: 8px;
@@ -904,6 +942,18 @@ footer.site .footer-credit a:hover { color: var(--gold); }
   z-index: 1;
   text-shadow: 0 1px 3px rgba(0,0,0,0.4);
 }
+.dial-song {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 1.2em;
+}
 .dial-lang {
   font-size: 0.85rem;
   color: rgba(255, 255, 255, 0.8);
@@ -1110,6 +1160,54 @@ input[data-modal-volume]::-moz-range-thumb {
   background: var(--gold);
   border: 2px solid #ffffff;
   cursor: pointer;
+}
+
+/* ------------ Sleep timer ------------ */
+.sleep-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  position: relative;
+}
+.sleep-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.sleep-btn:hover { color: var(--gold); border-color: var(--gold); }
+.sleep-btn svg { width: 16px; height: 16px; }
+.sleep-options {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.sleep-options button {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sleep-options button:hover {
+  border-color: var(--gold);
+  color: var(--gold);
 }
 
 /* ------------ Responsive ------------ */
