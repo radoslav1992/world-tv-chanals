@@ -224,19 +224,24 @@ section.player-section { padding-bottom: 4rem; }
 .feature p { color: var(--text-muted); margin: 0; font-size: 0.95rem; }
 
 .screenshots {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.25rem;
-  max-width: 900px;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.5rem 0 1rem;
+  max-width: 100%;
   margin: 0 auto;
 }
 .screenshots img {
-  width: 100%;
+  width: 220px;
+  height: auto;
   border-radius: 18px;
   display: block;
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
   border: 1px solid var(--border);
   transition: transform 0.25s, box-shadow 0.25s;
+  flex-shrink: 0;
 }
 .screenshots img:hover {
   transform: translateY(-4px);
@@ -624,6 +629,7 @@ footer.site .footer-credit a:hover { color: var(--gold); }
   border-radius: 12px;
   padding: 0.65rem 0.4rem;
   gap: 0.4rem;
+  overflow: hidden;
 }
 .stations.view-grid .station-logo {
   width: 44px;
@@ -635,6 +641,7 @@ footer.site .footer-credit a:hover { color: var(--gold); }
 .stations.view-grid .station-meta {
   align-items: center;
   width: 100%;
+  overflow: hidden;
 }
 .stations.view-grid .station-name {
   font-size: 0.78rem;
@@ -642,13 +649,25 @@ footer.site .footer-credit a:hover { color: var(--gold); }
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+  max-width: 100%;
 }
 .stations.view-grid .station-tag-row {
   justify-content: center;
+  flex-wrap: wrap;
+  overflow: hidden;
+  max-width: 100%;
 }
 .stations.view-grid .station-tag {
   font-size: 0.6rem;
   margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+.stations.view-grid .station-bitrate {
+  font-size: 0.5rem;
 }
 .stations.view-grid .station-votes {
   font-size: 0.55rem;
