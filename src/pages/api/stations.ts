@@ -18,18 +18,16 @@ export const GET: APIRoute = async () => {
   const seenUuid = new Set(raw1.map((s: any) => s.stationuuid));
   const merged = [...raw1, ...raw2.filter((s: any) => !seenUuid.has(s.stationuuid))];
 
-  const seenName = new Set<string>();
+  const seenUrl = new Set<string>();
   const deduped: any[] = [];
   for (const s of merged) {
-    const key = s.name.trim().toLowerCase();
-    if (seenName.has(key)) continue;
-    seenName.add(key);
+    const url = s.url_resolved;
+    if (!url || !url.startsWith('https://') || seenUrl.has(url)) continue;
+    seenUrl.add(url);
     deduped.push(s);
   }
 
-  const filtered = deduped.filter((s: any) => s.url_resolved.startsWith('https://'));
-
-  return new Response(JSON.stringify(filtered), {
+  return new Response(JSON.stringify(deduped), {
     headers: { 'Content-Type': 'application/json' },
   });
 };

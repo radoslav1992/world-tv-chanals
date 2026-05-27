@@ -1,12 +1,12 @@
 :root {
-  --bg: #f7f8fc;
-  --bg-elev: #ffffff;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f0f4f8;
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
+  --bg: #e8ecf3;
+  --bg-elev: #f0f2f7;
+  --bg-card: #f8f9fc;
+  --bg-card-hover: #edf0f6;
+  --border: #d5dbe5;
+  --border-strong: #bcc5d3;
   --text: #1e293b;
-  --text-muted: #64748b;
+  --text-muted: #5a6679;
   --gold: #0d9488;
   --gold-bright: #14b8a6;
   --gold-deep: #0f766e;
@@ -60,10 +60,10 @@ header.site {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: rgba(255, 255, 255, 0.96);
+  background: rgba(240, 242, 247, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 header.site .row {
   display: flex;
@@ -249,7 +249,7 @@ footer.site {
   margin-top: 4rem;
   color: var(--text-muted);
   font-size: 0.9rem;
-  background: #f1f5f9;
+  background: #e2e7f0;
 }
 footer.site .footer-grid {
   display: grid;
@@ -484,7 +484,7 @@ footer.site .footer-credit a:hover { color: var(--gold); }
   box-shadow: 0 0 0 1px var(--gold) inset;
 }
 .station-logo {
-  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  background: linear-gradient(135deg, #e8ecf3, #dce1ea);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -637,18 +637,18 @@ footer.site .footer-credit a:hover { color: var(--gold); }
   left: 0;
   right: 0;
   bottom: 0;
-  background: #ffffff;
+  background: var(--bg-card);
   border-top: 1px solid var(--border);
   padding: 0.85rem 1.25rem;
   display: none;
   align-items: center;
   gap: 0.75rem;
   z-index: 40;
-  box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+  box-shadow: 0 -4px 16px rgba(0,0,0,0.08);
   cursor: pointer;
   transition: background 0.15s;
 }
-.now-playing:hover { background: #f8fafc; }
+.now-playing:hover { background: var(--bg-elev); }
 .now-playing.visible { display: flex; }
 .now-playing .np-info {
   flex: 1;
@@ -772,7 +772,7 @@ footer.site .footer-credit a:hover { color: var(--gold); }
 .modal-radio {
   width: 100%;
   max-width: 420px;
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 22px;
   padding: 1rem 1.25rem 1.5rem;
@@ -830,7 +830,7 @@ footer.site .footer-credit a:hover { color: var(--gold); }
   border-radius: 12px;
   background:
     repeating-linear-gradient(180deg, rgba(0,0,0,0.05) 0 1px, transparent 1px 4px),
-    linear-gradient(180deg, #f1f5f9, #e2e8f0);
+    linear-gradient(180deg, #e8ecf3, #dce1ea);
   border: 1px solid var(--border);
   margin-bottom: 1.25rem;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
@@ -940,7 +940,7 @@ footer.site .footer-credit a:hover { color: var(--gold); }
 .modal-state .dot.error { background: var(--bg-red); }
 
 .vu-frame {
-  background: #f1f5f9;
+  background: #e2e7f0;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.75rem;
@@ -1394,7 +1394,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
   right: 0;
   bottom: var(--np-h);
   z-index: 90;
-  background: #ffffff;
+  background: var(--bg-card);
   border-top: 2px solid var(--gold);
   box-shadow: 0 -8px 30px rgba(0,0,0,0.08);
   animation: slide-up 0.3s ease-out;
@@ -1482,7 +1482,7 @@ button:focus-visible, a:focus-visible { outline-offset: 3px; }
     top: 100%;
     left: 0;
     right: 0;
-    background: #ffffff;
+    background: var(--bg-elev);
     border-bottom: 1px solid var(--border);
     flex-direction: column;
     padding: 0.85rem 1.5rem 1.25rem;
