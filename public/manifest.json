@@ -1,0 +1,23 @@
+{
+  "name": "Радио България",
+  "short_name": "Радио БГ",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#ece5d8",
+  "background_color": "#ece5d8",
+  "description": "Слушайте любимите български радио станции на едно място — музика, новини и забавление на живо.",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["music", "entertainment"],
+  "lang": "bg"
+}

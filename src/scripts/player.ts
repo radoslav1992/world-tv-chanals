@@ -10,10 +10,20 @@ import {
 
 const API_STATIONS = '/api/stations';
 const API_VOTE = '/api/vote';
+const API_NOW_PLAYING = '/api/now-playing';
 const STORAGE_KEY = 'br-last-station';
 const VOLUME_KEY = 'br-volume';
 const VIEW_KEY = 'br-view';
 const BATCH_SIZE = 24;
+const SONG_POLL_MS = 30_000;
+
+const GENRE_MAP: Record<string, string> = {
+  pop: 'Поп', rock: 'Рок', folk: 'Фолк', jazz: 'Джаз', classical: 'Класика',
+  news: 'Новини', dance: 'Танцувална', electronic: 'Електронна', 'hip hop': 'Хип-хоп',
+  '80s': 'Ретро', '90s': 'Ретро', retro: 'Ретро', oldies: 'Ретро',
+  chalga: 'Чалга', 'pop folk': 'Чалга', turbofolk: 'Чалга',
+  ambient: 'Релакс', chillout: 'Релакс', lounge: 'Релакс',
+};
 
 type View = 'list' | 'grid';
 type Mode = 'browse' | 'favorites' | 'history';
@@ -38,6 +48,17 @@ class Player {
   private view: View = 'list';
   private stationCards = new Map<string, HTMLElement>();
   private observer: IntersectionObserver | null = null;
+  private activeGenre = 'all';
+  private genreContainer: HTMLElement | null = null;
+
+  // Sleep timer
+  private sleepTimeout: ReturnType<typeof setTimeout> | null = null;
+  private sleepEnd = 0;
+  private sleepInterval: ReturnType<typeof setInterval> | null = null;
+
+  // Now-playing song
+  private songPollTimer: ReturnType<typeof setInterval> | null = null;
+  private npSongEl: HTMLElement | null = null;
 
   // Mini bar refs
   private nowPlaying: HTMLElement;
@@ -151,6 +172,33 @@ class Player {
     });
 
     if (this.searchEl) this.searchEl.addEventListener('input', () => this.applyFilter());
+    this.genreContainer = document.querySelector<HTMLElement>('[data-genres]');
+    this.npSongEl = document.querySelector<HTMLElement>('[data-np-song]');
+
+    // Sleep timer
+    const sleepToggle = document.querySelector<HTMLButtonElement>('[data-sleep-toggle]');
+    const sleepOptions = document.querySelector<HTMLElement>('[data-sleep-options]');
+    if (sleepToggle && sleepOptions) {
+      sleepToggle.addEventListener('click', () => {
+        sleepOptions.hidden = !sleepOptions.hidden;
+      });
+      sleepOptions.querySelectorAll<HTMLButtonElement>('[data-sleep-min]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const mins = parseInt(btn.dataset.sleepMin || '0');
+          this.setSleepTimer(mins);
+          sleepOptions.hidden = true;
+        });
+      });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if ((e.target as HTMLElement).tagName === 'INPUT') return;
+      if (e.key === ' ' && !this.modal.classList.contains('visible')) { e.preventDefault(); this.toggle(); }
+      if (e.key === 'ArrowLeft') this.step(-1);
+      if (e.key === 'ArrowRight') this.step(1);
+      if (e.key === 'm' || e.key === 'M') { this.audio.muted = !this.audio.muted; }
+    });
 
     document.addEventListener(STORE_EVENT, (e) => {
       const detail = (e as CustomEvent).detail as { kind: string };
@@ -179,6 +227,7 @@ class Player {
       this.statusEl.style.display = 'none';
       const toolbar = document.querySelector<HTMLElement>('.player-toolbar');
       if (toolbar) toolbar.style.display = '';
+      if (this.mode === 'browse') this.buildGenreFilters();
       this.applyFilter();
       this.setupInfiniteScroll();
     } catch (err) {
@@ -208,17 +257,111 @@ class Player {
 
   private applyFilter() {
     const q = this.searchEl ? this.searchEl.value.trim().toLowerCase() : '';
+    let list = this.all;
+    if (this.activeGenre !== 'all') {
+      list = list.filter((s) => this.stationMatchesGenre(s, this.activeGenre));
+    }
     this.filtered = q
-      ? this.all.filter((s) =>
+      ? list.filter((s) =>
           s.name.toLowerCase().includes(q) || s.tags.toLowerCase().includes(q)
         )
-      : this.all;
+      : list;
     this.rendered = 0;
     this.stationsEl.innerHTML = '';
     this.stationCards.clear();
     this.updateCount();
     this.renderNextBatch();
     this.updateNavButtons();
+  }
+
+  private stationMatchesGenre(s: Station, genre: string): boolean {
+    const tags = s.tags.toLowerCase();
+    for (const [key, bg] of Object.entries(GENRE_MAP)) {
+      if (bg === genre && tags.includes(key)) return true;
+    }
+    return false;
+  }
+
+  private buildGenreFilters() {
+    if (!this.genreContainer) return;
+    const genreCounts = new Map<string, number>();
+    for (const s of this.all) {
+      const tags = s.tags.toLowerCase();
+      for (const [key, bg] of Object.entries(GENRE_MAP)) {
+        if (tags.includes(key)) {
+          genreCounts.set(bg, (genreCounts.get(bg) || 0) + 1);
+        }
+      }
+    }
+    const sorted = [...genreCounts.entries()]
+      .filter(([, c]) => c >= 2)
+      .sort((a, b) => b[1] - a[1]);
+    if (sorted.length === 0) return;
+
+    this.genreContainer.style.display = '';
+    this.genreContainer.innerHTML = `<button class="genre-pill active" data-genre="all">Всички</button>`
+      + sorted.map(([name]) =>
+        `<button class="genre-pill" data-genre="${escapeAttr(name)}">${escapeHtml(name)}</button>`
+      ).join('');
+    this.genreContainer.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-genre]');
+      if (!btn) return;
+      this.activeGenre = btn.dataset.genre || 'all';
+      this.genreContainer!.querySelectorAll('.genre-pill').forEach((b) =>
+        b.classList.toggle('active', (b as HTMLElement).dataset.genre === this.activeGenre)
+      );
+      this.applyFilter();
+    });
+  }
+
+  private setSleepTimer(minutes: number) {
+    if (this.sleepTimeout) clearTimeout(this.sleepTimeout);
+    if (this.sleepInterval) clearInterval(this.sleepInterval);
+    this.sleepTimeout = null;
+    this.sleepInterval = null;
+    this.sleepEnd = 0;
+    const label = document.querySelector<HTMLElement>('[data-sleep-label]');
+    if (minutes <= 0) {
+      if (label) label.textContent = 'Таймер';
+      return;
+    }
+    this.sleepEnd = Date.now() + minutes * 60_000;
+    this.sleepTimeout = setTimeout(() => {
+      this.audio.pause();
+      this.setSleepTimer(0);
+    }, minutes * 60_000);
+    this.sleepInterval = setInterval(() => {
+      const left = Math.max(0, Math.ceil((this.sleepEnd - Date.now()) / 60_000));
+      if (label) label.textContent = `${left} мин`;
+    }, 10_000);
+    if (label) label.textContent = `${minutes} мин`;
+  }
+
+  private startSongPoll() {
+    this.stopSongPoll();
+    this.fetchNowPlaying();
+    this.songPollTimer = setInterval(() => this.fetchNowPlaying(), SONG_POLL_MS);
+  }
+
+  private stopSongPoll() {
+    if (this.songPollTimer) clearInterval(this.songPollTimer);
+    this.songPollTimer = null;
+  }
+
+  private async fetchNowPlaying() {
+    if (!this.current || this.state !== 'playing') return;
+    try {
+      const res = await fetch(API_NOW_PLAYING, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: this.current.url_resolved }),
+      });
+      const data = await res.json();
+      const song = data.title || '';
+      if (this.npSongEl) this.npSongEl.textContent = song;
+      const modalSong = document.querySelector<HTMLElement>('[data-modal-song]');
+      if (modalSong) modalSong.textContent = song;
+    } catch { /* ignore */ }
   }
 
   private updateCount() {
@@ -486,6 +629,7 @@ class Player {
     this.npToggle.setAttribute('aria-label', ariaLabel);
     this.modalToggle.setAttribute('aria-label', ariaLabel);
     this.modalVu.classList.toggle('animating', state === 'playing');
+    if (state === 'playing') this.startSongPoll(); else this.stopSongPoll();
     if (this.current) {
       const isActive = !this.audio.paused;
       this.updateActiveCard(isActive ? this.current.stationuuid : null);
