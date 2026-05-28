@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "bulgarian-radio-landing",
+  "name": "world-tv-channels",
   "compatibility_date": "2026-05-26",
   "observability": {
     "enabled": true

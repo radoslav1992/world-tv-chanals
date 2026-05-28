@@ -1,11 +1,11 @@
 {
-  "name": "Радио България",
-  "short_name": "Радио БГ",
+  "name": "World TV Channels",
+  "short_name": "World TV",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#ece5d8",
-  "background_color": "#ece5d8",
-  "description": "Слушайте любимите български радио станции на едно място — музика, новини и забавление на живо.",
+  "theme_color": "#0f1320",
+  "background_color": "#0f1320",
+  "description": "Watch thousands of live TV channels from around the world — news, sport, movies and more, free in your browser.",
   "icons": [
     {
       "src": "/logo.png",
@@ -18,6 +18,6 @@
       "type": "image/png"
     }
   ],
-  "categories": ["music", "entertainment"],
-  "lang": "bg"
+  "categories": ["entertainment", "news"],
+  "lang": "en"
 }

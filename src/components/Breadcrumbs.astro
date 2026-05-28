@@ -8,7 +8,7 @@ interface Props {
 }
 const { crumbs } = Astro.props;
 
-const SITE_URL = 'https://bulgariaradio.com';
+const SITE_URL = 'https://worldtvchannels.org';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -21,7 +21,7 @@ const jsonLd = {
   })),
 };
 ---
-<nav class="breadcrumbs container" aria-label="Навигация">
+<nav class="breadcrumbs container" aria-label="Breadcrumb">
   <ol>
     {crumbs.map((c, i) => (
       <li>

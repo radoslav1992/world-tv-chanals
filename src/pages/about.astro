@@ -4,101 +4,91 @@ import Base from '../layouts/Base.astro';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
-  name: 'За проекта Радио България',
-  inLanguage: 'bg',
+  name: 'About World TV Channels',
+  inLanguage: 'en',
 };
 ---
 <Base
-  title="За нас — Радио България"
-  description="Кратка история за проекта Радио България, защо е създаден и как работи."
+  title="About — World TV Channels"
+  description="What World TV Channels is, why it was built, and how it works."
   jsonLd={jsonLd}
 >
   <article class="legal container">
-    <h1>За проекта</h1>
-    <p class="updated">Малък независим проект за българско радио онлайн</p>
+    <h1>About the project</h1>
+    <p class="updated">A small independent project for watching world TV online</p>
 
-    <h2>Каква е идеята</h2>
+    <h2>The idea</h2>
     <p>
-      Радио България е безплатна платформа, която събира на едно място
-      българските радио станции, излъчващи онлайн поток. Целта е проста: да
-      намерите любимата си станция за секунди — без да ровите в радио сайтове,
-      без да създавате акаунти, без реклама в самата музика. Работим и по
-      Android приложение, което ще бъде достъпно скоро.
+      World TV Channels is a free platform that brings together live TV channels
+      from around the world in one place. The goal is simple: to help you find a
+      channel to watch in seconds — without digging through broadcaster websites,
+      without creating accounts, and without a set-top box or satellite dish.
     </p>
     <p>
-      Приложението е насочено както към слушатели в България, така и към
-      българската диаспора по света, за която родното радио е малък ежедневен
-      ритуал.
-    </p>
-
-    <h2>Как е създадено</h2>
-    <p>
-      Проектът е разработен от един човек в свободното време, без външно
-      финансиране и без връзка с конкретна медийна група или радиостанция.
-      Поддръжката се покрива от ненатрапчиви рекламни банери — нищо повече.
-    </p>
-    <p>
-      Уеб версията, която виждате на този сайт, е основният начин да слушате —
-      директно в браузъра, без инсталация. Когато Android приложението бъде
-      готово, то ще предложи допълнителни функции като работа от заключен екран.
+      It’s designed for anyone curious about global television — from news junkies
+      who want to compare how different countries cover the same story, to people
+      living abroad who want a taste of home.
     </p>
 
-    <h2>Откъде идват станциите</h2>
+    <h2>How it’s made</h2>
     <p>
-      Каталогът се захранва изцяло от
-      <a href="https://www.radio-browser.info" target="_blank" rel="noopener noreferrer">Radio Browser</a> —
-      отворена, общностно поддържана база данни с радио станции от целия свят.
-      Това гарантира, че списъкът е винаги актуален: ако някоя станция започне
-      да излъчва или промени потока си, ще се появи и тук без актуализация на
-      приложението.
+      The project is developed by a small team in their spare time, with no
+      outside funding and no affiliation to any particular broadcaster or media
+      group. Running costs are covered by unobtrusive advertising banners —
+      nothing more.
     </p>
     <p>
-      Самото съдържание — музика, новини, реклами, говорно радио — се излъчва от
-      съответните радиостанции и им принадлежи изцяло. Радио България само
-      препраща потока към вашето устройство.
+      The site you’re using is a static website that plays live streams directly
+      in your browser. There’s no app to install — it works in any modern browser
+      on desktop and mobile.
     </p>
 
-    <h2>Какво НЕ правим</h2>
+    <h2>Where the channels come from</h2>
+    <p>
+      The catalogue is powered entirely by
+      <a href="https://github.com/iptv-org/iptv" target="_blank" rel="noopener noreferrer">iptv-org</a> —
+      an open, community-maintained collection of publicly available TV streams
+      from around the world. This keeps the list fresh: when a channel comes
+      online or changes its stream, it shows up here without an app update.
+    </p>
+    <p>
+      The content itself — programmes, news, films, advertising — is broadcast by
+      the respective channels and belongs entirely to them. World TV Channels
+      simply helps you find and play the publicly available streams.
+    </p>
+
+    <h2>What we DON’T do</h2>
     <ul>
-      <li>Не запазваме нищо за вас на сървър — нямаме сървър за потребители.</li>
-      <li>Не изискваме акаунт, имейл или телефонен номер.</li>
-      <li>Не следим какво слушате — статистиките на Radio Browser са анонимни.</li>
-      <li>Не прекъсваме музиката с реклами — банерите са встрани от плейъра.</li>
-      <li>Не препродаваме никакви данни.</li>
+      <li>We don’t store anything about you on a server — we have no user server.</li>
+      <li>We don’t require an account, email or phone number.</li>
+      <li>We don’t track what you watch — your favorites and history stay in your browser.</li>
+      <li>We don’t host or rebroadcast any content — streams come straight from their sources.</li>
+      <li>We don’t resell any data.</li>
     </ul>
 
-    <h2>Технически детайли</h2>
+    <h2>Technical details</h2>
     <p>
-      Android приложението е в разработка — ще бъде написано на Kotlin и ще
-      поддържа възпроизвеждане от заключения екран, MediaSession за управление
-      с физически бутони и работа на фон.
-    </p>
-    <p>
-      Уеб плейърът на този сайт е статичен сайт, написан с
-      <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a>, и
-      пуска потока с native HTML5 audio. Списъкът на любимите и историята се
-      пазят локално в браузъра ви (localStorage) — не напускат устройството.
-    </p>
-
-    <h2>Кой стои зад проекта</h2>
-    <p>
-      Радио България е създадено от Радослав — софтуерен разработчик и любител на
-      българската музика. Идеята се роди от простата нужда да се чуе родно радио
-      бързо, без реклами в самия плейър и без излишни стъпки. Проектът е
-      изцяло самофинансиран и се развива в свободно време.
+      The web player is a static site built with
+      <a href="https://astro.build" target="_blank" rel="noopener noreferrer">Astro</a> and
+      deployed on the edge. Live streams use HLS (HTTP Live Streaming) and are
+      played with the open-source
+      <a href="https://github.com/video-dev/hls.js" target="_blank" rel="noopener noreferrer">hls.js</a>
+      library, falling back to native playback on Safari and iOS. Your favorites
+      and history are stored locally in your browser (localStorage) and never
+      leave your device.
     </p>
 
-    <h2>Блог</h2>
+    <h2>Blog</h2>
     <p>
-      В <a href="/blog">нашия блог</a> публикуваме статии за българското радио,
-      музикалната сцена и полезни съвети за слушатели. Ако ви е интересно как
-      работи интернет радиото или искате да откриете нови станции — разгледайте.
+      On <a href="/blog">our blog</a> we publish articles about international TV
+      channels, broadcasting history and online streaming. If you want to learn
+      how IPTV works or discover new channels — take a look.
     </p>
 
-    <h2>Връзка</h2>
+    <h2>Get in touch</h2>
     <p>
-      Имате обратна връзка, искате да докладвате счупена станция или просто да
-      кажете здравей? Пишете ни на <a href="/contact">страницата за контакт</a>.
+      Have feedback, want to report a broken channel, or just say hello? Reach us
+      on the <a href="/contact">contact page</a>.
     </p>
   </article>
 </Base>

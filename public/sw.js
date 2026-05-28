@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'radio-bg-v1';
+const CACHE_VERSION = 'world-tv-v1';
 const APP_SHELL = [
   '/',
   '/logo.png',
@@ -35,16 +35,17 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Network-first for API calls, audio streams, and non-GET requests
+  // Network-only for API calls, media streams, and non-GET requests.
+  // Never cache cross-origin HLS playlists/segments or our channel API.
   if (
     request.method !== 'GET' ||
+    url.origin !== self.location.origin ||
     url.pathname.startsWith('/api') ||
     request.url.includes('stream') ||
-    request.headers.get('accept')?.includes('audio') ||
-    url.protocol === 'icy:' ||
-    url.pathname.endsWith('.mp3') ||
-    url.pathname.endsWith('.aac') ||
-    url.pathname.endsWith('.ogg')
+    request.headers.get('accept')?.includes('video') ||
+    url.pathname.endsWith('.m3u8') ||
+    url.pathname.endsWith('.ts') ||
+    url.pathname.endsWith('.mp4')
   ) {
     event.respondWith(fetch(request));
     return;

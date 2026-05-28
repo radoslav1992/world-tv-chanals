@@ -2,11 +2,11 @@ import { getCollection } from 'astro:content';
 
 export const prerender = true;
 
-const SITE = 'https://bulgariaradio.com';
+const SITE = 'https://worldtvchannels.org';
 
 const staticPages = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
-  { loc: '/stations', changefreq: 'weekly', priority: '0.9' },
+  { loc: '/channels', changefreq: 'weekly', priority: '0.9' },
   { loc: '/blog', changefreq: 'weekly', priority: '0.9' },
   { loc: '/about', changefreq: 'monthly', priority: '0.7' },
   { loc: '/contact', changefreq: 'monthly', priority: '0.7' },
@@ -15,9 +15,9 @@ const staticPages = [
 ];
 
 export async function GET() {
-  const [posts, stations] = await Promise.all([
+  const [posts, channels] = await Promise.all([
     getCollection('blog'),
-    getCollection('stations'),
+    getCollection('channels'),
   ]);
 
   const blogEntries = posts
@@ -29,10 +29,10 @@ export async function GET() {
       priority: '0.8',
     }));
 
-  const stationEntries = stations
-    .sort((a, b) => a.data.name.localeCompare(b.data.name, 'bg'))
-    .map((s) => ({
-      loc: `/stations/${s.slug}`,
+  const channelEntries = channels
+    .sort((a, b) => a.data.name.localeCompare(b.data.name, 'en'))
+    .map((c) => ({
+      loc: `/channels/${c.slug}`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'monthly',
       priority: '0.8',
@@ -40,7 +40,7 @@ export async function GET() {
 
   const allEntries = [
     ...staticPages.map((p) => ({ ...p, lastmod: new Date().toISOString().split('T')[0] })),
-    ...stationEntries,
+    ...channelEntries,
     ...blogEntries,
   ];
 

@@ -1,0 +1,105 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const channels = await getCollection('channels');
+  return channels.map((channel) => ({
+    params: { slug: channel.slug },
+    props: { channel },
+  }));
+}
+
+const { channel } = Astro.props;
+const { Content } = await channel.render();
+
+const allChannels = await getCollection('channels');
+const similar = allChannels
+  .filter((c) => c.slug !== channel.slug && c.data.category === channel.data.category)
+  .slice(0, 4);
+
+const SITE_URL = 'https://worldtvchannels.org';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'TelevisionStation',
+  name: channel.data.name,
+  description: channel.data.description,
+  ...(channel.data.launched ? { foundingDate: channel.data.launched } : {}),
+  ...(channel.data.owner ? { parentOrganization: { '@type': 'Organization', name: channel.data.owner } } : {}),
+  ...(channel.data.headquarters ? { address: { '@type': 'PostalAddress', addressLocality: channel.data.headquarters } } : {}),
+  ...(channel.data.website ? { url: channel.data.website } : {}),
+  ...(channel.data.slogan ? { slogan: channel.data.slogan } : {}),
+  inLanguage: channel.data.language,
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': `${SITE_URL}/channels/${channel.slug}`,
+  },
+};
+---
+<Base
+  title={`${channel.data.name} — channel profile, history & how to watch`}
+  description={channel.data.description}
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Channels', href: '/channels' },
+    { label: channel.data.name },
+  ]} />
+
+  <article class="container legal blog-post">
+    <h1>{channel.data.name}</h1>
+
+    <div class="station-infobox">
+      <table>
+        {channel.data.category && <tr><th>Category</th><td>{channel.data.category}</td></tr>}
+        {channel.data.launched && <tr><th>Launched</th><td>{channel.data.launched}</td></tr>}
+        {channel.data.owner && <tr><th>Owner</th><td>{channel.data.owner}</td></tr>}
+        {channel.data.headquarters && <tr><th>Headquarters</th><td>{channel.data.headquarters}</td></tr>}
+        {channel.data.slogan && <tr><th>Slogan</th><td><em>{channel.data.slogan}</em></td></tr>}
+        {channel.data.availability.length > 0 && (
+          <tr><th>Available on</th><td>{channel.data.availability.join(', ')}</td></tr>
+        )}
+        {channel.data.website && (
+          <tr><th>Website</th><td><a href={channel.data.website} target="_blank" rel="noopener noreferrer">{channel.data.website.replace('https://', '')}</a></td></tr>
+        )}
+        <tr><th>Language</th><td>{channel.data.language}</td></tr>
+        <tr><th>Country</th><td>{channel.data.country}</td></tr>
+      </table>
+    </div>
+
+    <Content />
+
+    {similar.length > 0 && (
+      <div class="similar-stations">
+        <h2>Similar channels</h2>
+        <div class="station-directory" style="margin-bottom:2rem;">
+          {similar.map((c) => (
+            <a href={`/channels/${c.slug}`} class="blog-card">
+              <div class="blog-card-body">
+                <div class="blog-card-tags">
+                  <span class="tag-chip">{c.data.category}</span>
+                </div>
+                <h3>{c.data.name}</h3>
+                <p>{c.data.description}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="blog-cta">
+      <p>Find {channel.data.name} in our player or watch directly from the channel’s official site.</p>
+      <div class="hero-ctas">
+        <a class="cta cta-secondary" href="/#player">Search the player</a>
+        {channel.data.website && (
+          <a class="cta cta-secondary" href={channel.data.website} target="_blank" rel="noopener noreferrer">Official site</a>
+        )}
+        <a class="cta cta-secondary" href="/channels">All channels</a>
+      </div>
+    </div>
+  </article>
+</Base>

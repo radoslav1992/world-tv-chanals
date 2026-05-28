@@ -11,9 +11,9 @@ const getReadingTime = (body: string) => Math.max(1, Math.round((body || '').spl
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Blog',
-  name: 'Блог — Радио България',
-  description: 'Статии за българското радио, музика и интернет стрийминг.',
-  inLanguage: 'bg',
+  name: 'Blog — World TV Channels',
+  description: 'Articles about international TV channels, broadcasting and streaming.',
+  inLanguage: 'en',
   blogPost: posts.map((p) => ({
     '@type': 'BlogPosting',
     headline: p.data.title,
@@ -24,19 +24,19 @@ const jsonLd = {
 };
 ---
 <Base
-  title="Блог — Радио България"
-  description="Статии за българското радио, музикалната сцена, интернет стрийминг и съвети за слушатели."
+  title="Blog — World TV Channels"
+  description="Articles about international TV channels, broadcasting history, public-service media and online streaming."
   jsonLd={jsonLd}
 >
   <Breadcrumbs crumbs={[
-    { label: 'Начало', href: '/' },
-    { label: 'Блог' },
+    { label: 'Home', href: '/' },
+    { label: 'Blog' },
   ]} />
 
   <section class="container blog-index">
     <div class="section-head">
-      <h1>Блог</h1>
-      <p>Статии за българското радио, музика и полезни съвети за слушатели.</p>
+      <h1>Blog</h1>
+      <p>Articles about international TV channels, broadcasting and online streaming.</p>
     </div>
 
     <div class="blog-grid">
@@ -51,13 +51,13 @@ const jsonLd = {
             <h2>{post.data.title}</h2>
             <p>{post.data.description}</p>
             <time datetime={post.data.date}>
-              {new Date(post.data.date).toLocaleDateString('bg-BG', {
+              {new Date(post.data.date).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric',
               })}
             </time>
-            <span> · {getReadingTime(post.body)} мин.</span>
+            <span> · {getReadingTime(post.body)} min read</span>
           </div>
         </a>
       ))}

@@ -1,190 +1,163 @@
 ---
 import Base from '../layouts/Base.astro';
-const CONTACT_EMAIL = 'contact@bulgariaradio.com';
+const CONTACT_EMAIL = 'contact@worldtvchannels.org';
 ---
 <Base
-  title="Политика за поверителност — Радио България"
-  description="Как обработваме данни в приложението и на този сайт. AdMob, AdSense, бисквитки, GDPR."
+  title="Privacy Policy — World TV Channels"
+  description="How we handle data on this site. AdSense, cookies, GDPR."
 >
   <article class="container legal">
-    <h1>Политика за поверителност</h1>
-    <p class="updated">Последна актуализация: 26 май 2026 г.</p>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: 26 May 2026</p>
 
     <p>
-      Тази политика обяснява как <strong>Радио България</strong> (Android
-      приложението и сайтът, наричани заедно „услугата“) обработва информация.
-      Уважаваме поверителността ви и сме разработили услугата така, че да събира
-      възможно най-малко данни.
+      This policy explains how <strong>World TV Channels</strong> (the website,
+      referred to here as “the service”) handles information. We respect your
+      privacy and have designed the service to collect as little data as possible.
     </p>
 
-    <h2>1. Кой администрира данните</h2>
+    <h2>1. Who controls the data</h2>
     <p>
-      Услугата се разработва и поддържа от независим разработчик („ние“). Нямаме
-      сървъри за съхранение на потребителски данни. За въпроси по тази политика
-      пишете на <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+      The service is developed and maintained by an independent team (“we”). We
+      have no servers for storing user data. For questions about this policy,
+      write to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
     </p>
 
-    <h2>2. Данни, които услугата събира</h2>
+    <h2>2. Data the service collects</h2>
     <p>
-      <strong>Не съхраняваме лични данни на наши сървъри.</strong> Не
-      поддържаме потребителски акаунти и не изискваме регистрация.
+      <strong>We do not store personal data on our servers.</strong> We do not
+      maintain user accounts and do not require registration.
     </p>
-    <h3>В Android приложението</h3>
     <ul>
       <li>
-        <strong>Любими станции и история на слушане</strong> се пазят само
-        локално на устройството ви и не се изпращат към нас.
+        <strong>Your chosen layout, last-watched channel, favorites and history</strong>
+        are saved in your browser’s <em>localStorage</em>. They never leave your
+        device and cannot be read by us or other websites.
       </li>
       <li>
-        Можете да изтриете тази информация по всяко време, като изчистите
-        данните на приложението от настройките на устройството или като го
-        деинсталирате.
-      </li>
-    </ul>
-    <h3>На този сайт</h3>
-    <ul>
-      <li>
-        <strong>Избран изглед, последна слушана станция, любими и история</strong>
-        се записват в <em>localStorage</em> на браузъра ви. Те не напускат
-        устройството ви и не могат да бъдат прочетени от нас или други сайтове.
+        <strong>A consent cookie</strong> (<code>wtv-consent-v1</code>) is stored
+        if you make a choice in the cookie banner, so we don’t ask again. It
+        contains no personal data.
       </li>
       <li>
-        <strong>Бисквитка за съгласие</strong> (<code>br-consent-v1</code>) се
-        записва, ако сте взели решение в банера за бисквитки, за да не ви питаме
-        отново. Не съдържа лични данни.
-      </li>
-      <li>
-        Можете да изчистите всички тези данни от настройките на браузъра си
-        („Изтриване на данни на сайт“ за домейна на този сайт).
+        You can clear all of this data from your browser settings (“Clear site
+        data” for this site’s domain).
       </li>
     </ul>
 
-    <h2>3. Използване на интернет</h2>
-    <p>Услугата се свързва с интернет за следните цели:</p>
+    <h2>3. Use of the internet</h2>
+    <p>The service connects to the internet for the following purposes:</p>
     <ul>
       <li>
-        <strong>Стрийминг на радио станции</strong> — звуковите потоци идват
-        директно от сървърите на съответните радиостанции. Каталогът се получава
-        от публичното API на
-        <a href="https://www.radio-browser.info/" target="_blank" rel="noopener noreferrer">radio-browser.info</a>.
-        Когато слушате станция, IP адресът ви може да бъде видим за оператора ѝ —
-        както при всеки уеб стрийминг.
+        <strong>Streaming TV channels</strong> — video streams come directly from
+        the servers of the respective channels. The channel catalogue is obtained
+        from the open
+        <a href="https://github.com/iptv-org/iptv" target="_blank" rel="noopener noreferrer">iptv-org</a>
+        project. When you watch a channel, your IP address may be visible to the
+        stream’s operator — as with any web streaming.
       </li>
       <li>
-        <strong>Реклами</strong> — приложението показва реклами чрез Google
-        AdMob, а този сайт планира да показва реклами чрез Google AdSense
-        (вижте следващата секция).
+        <strong>Advertising</strong> — this site plans to display ads via Google
+        AdSense (see the next section).
       </li>
       <li>
-        <strong>Шрифтове</strong> — сайтът зарежда Google Fonts от
-        <code>fonts.googleapis.com</code>. Google може да види вашия IP адрес при
-        зареждане.
+        <strong>Fonts</strong> — the site loads Google Fonts from
+        <code>fonts.googleapis.com</code>. Google may see your IP address when
+        fonts load.
       </li>
     </ul>
 
-    <h2>4. Реклами (Google AdMob и Google AdSense)</h2>
+    <h2>4. Advertising (Google AdSense)</h2>
     <p>
-      Приложението използва <strong>Google AdMob</strong>, а сайтът планира да
-      използва <strong>Google AdSense</strong> за показване на реклами. Тези
-      рекламни мрежи и техните партньори могат да поставят бисквитки и да
-      събират информация като:
+      The site plans to use <strong>Google AdSense</strong> to display ads. These
+      ad networks and their partners may set cookies and collect information such
+      as:
     </p>
     <ul>
-      <li>Рекламен идентификатор на устройството или браузъра</li>
-      <li>IP адрес, тип устройство, операционна система, тип браузър</li>
-      <li>Груба геолокация (на ниво държава/град)</li>
-      <li>Взаимодействие с рекламите (показвания, кликвания)</li>
-      <li>Посетени страници на сайта</li>
+      <li>An advertising identifier for your browser</li>
+      <li>IP address, device type, operating system, browser type</li>
+      <li>Coarse geolocation (country/city level)</li>
+      <li>Interaction with ads (impressions, clicks)</li>
+      <li>Pages visited on the site</li>
     </ul>
     <p>
-      Целта е показване на по-релевантни реклами, измерване на ефективността им
-      и предотвратяване на измами. Тези данни се обработват от Google според:
+      The purpose is to show more relevant ads, measure their effectiveness and
+      prevent fraud. This data is processed by Google in accordance with:
     </p>
     <ul>
       <li>
         <a href="https://policies.google.com/technologies/ads" target="_blank" rel="noopener noreferrer">
-          Как Google използва информация от сайтове и приложения с реклами
-        </a>
-      </li>
-      <li>
-        <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">
-          Политика за партньорски сайтове и приложения
+          How Google uses information from sites or apps that use its services
         </a>
       </li>
       <li>
         <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
-          Политика за поверителност на Google
+          Google Privacy Policy
         </a>
       </li>
     </ul>
-    <p>
-      Управление на персонализирани реклами:
-    </p>
+    <p>Managing personalised ads:</p>
     <ul>
-      <li>В Android: <em>Настройки → Google → Реклами → Откажи персонализирани реклами</em>.</li>
-      <li>В браузъра: <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">Настройки за реклами на Google</a>.</li>
-      <li>На сайта: можете да изберете „Само необходимите“ в банера за бисквитки.</li>
+      <li>In your browser: <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">Google Ads Settings</a>.</li>
+      <li>On the site: you can choose “Necessary only” in the cookie banner.</li>
     </ul>
 
-    <h2>5. Бисквитки на сайта</h2>
-    <p>Сайтът използва два вида бисквитки и подобни технологии:</p>
+    <h2>5. Cookies on the site</h2>
+    <p>The site uses two kinds of cookies and similar technologies:</p>
     <ul>
       <li>
-        <strong>Технически необходими</strong> — <code>localStorage</code>
-        записи за избран изглед, любими, история и избор за бисквитки. Без тях
-        приложението не може да помни вашите предпочитания.
+        <strong>Technically necessary</strong> — <code>localStorage</code> entries
+        for your chosen layout, favorites, history and cookie choice. Without
+        them, the service cannot remember your preferences.
       </li>
       <li>
-        <strong>Рекламни (трета страна)</strong> — Google AdSense и неговите
-        партньори могат да поставят бисквитки за персонализиране на реклами. Тези
-        бисквитки се поставят само след одобрението ви в банера или след като
-        AdSense бъде активиран.
+        <strong>Advertising (third party)</strong> — Google AdSense and its
+        partners may set cookies to personalise ads. These are set only after
+        your approval in the banner or once AdSense is activated.
       </li>
     </ul>
 
-    <h2>6. Вашите права съгласно GDPR</h2>
-    <p>Като жител на Европейския съюз имате право на:</p>
+    <h2>6. Your rights under GDPR</h2>
+    <p>As a resident of the European Union you have the right to:</p>
     <ul>
-      <li>Достъп до личните си данни</li>
-      <li>Корекция или изтриване („право да бъдете забравен“)</li>
-      <li>Ограничаване или възражение срещу обработката</li>
-      <li>Преносимост на данните</li>
-      <li>Оттегляне на съгласие за обработка по всяко време</li>
-      <li>Подаване на жалба до надзорен орган (за България — КЗЛД)</li>
+      <li>Access your personal data</li>
+      <li>Correction or erasure (“the right to be forgotten”)</li>
+      <li>Restriction of, or objection to, processing</li>
+      <li>Data portability</li>
+      <li>Withdraw consent to processing at any time</li>
+      <li>Lodge a complaint with a supervisory authority</li>
     </ul>
     <p>
-      Тъй като не съхраняваме лични данни на наши сървъри, повечето права се
-      упражняват директно от устройството ви — изтриване на данните на
-      приложението в Android, или изчистване на данните за сайта в браузъра.
-      За въпроси относно данните, обработвани от Google AdMob/AdSense, моля
-      свържете се с Google чрез линковете по-горе.
+      Because we don’t store personal data on our servers, most rights are
+      exercised directly from your device — by clearing the site’s data in your
+      browser. For questions about data processed by Google AdSense, please
+      contact Google via the links above.
     </p>
 
-    <h2>7. Деца</h2>
+    <h2>7. Children</h2>
     <p>
-      Услугата не е предназначена за деца под 13 години и не събираме съзнателно
-      данни от деца под тази възраст. Ако смятате, че сте получили достъп до
-      такива данни, моля свържете се с нас, за да ги изтрием.
+      The service is not intended for children under 13, and we do not knowingly
+      collect data from children under that age. Adult (NSFW) channels are
+      filtered out of the catalogue. If you believe a child has provided us with
+      data, please contact us so we can delete it.
     </p>
 
-    <h2>8. Сигурност</h2>
+    <h2>8. Security</h2>
     <p>
-      Сайтът се предоставя през HTTPS. Тъй като не държим лични данни на сървър,
-      основните рискове за поверителността са свързани с устройството ви и с
-      третите страни (Radio Browser, Google) — препоръчваме да четете и техните
-      политики.
+      The site is served over HTTPS. Because we don’t hold personal data on a
+      server, the main privacy considerations relate to your device and to third
+      parties (iptv-org, Google) — we recommend reading their policies too.
     </p>
 
-    <h2>9. Промени в политиката</h2>
+    <h2>9. Changes to this policy</h2>
     <p>
-      Може да актуализираме тази политика периодично. Значителни промени ще
-      бъдат отразени с нова дата в горната част на страницата. Препоръчваме да
-      проверявате периодично.
+      We may update this policy from time to time. Significant changes will be
+      reflected with a new date at the top of the page.
     </p>
 
-    <h2>10. Контакт</h2>
+    <h2>10. Contact</h2>
     <p>
-      За въпроси относно тази политика или вашите данни, моля пишете на:
+      For questions about this policy or your data, please write to:
       <br />
       <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
     </p>
