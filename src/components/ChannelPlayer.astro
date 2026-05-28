@@ -1,0 +1,174 @@
+---
+interface Props {
+  /**
+   * 'browse'    — server-paginated channel list from the iptv-org API.
+   * 'favorites' — render saved favorites from localStorage.
+   * 'history'   — render watch history from localStorage.
+   */
+  mode?: 'browse' | 'favorites' | 'history';
+  /** Whether to show the search input. Defaults to true. */
+  showSearch?: boolean;
+}
+const { mode = 'browse', showSearch = true } = Astro.props;
+---
+<div class="player" data-player data-mode={mode}>
+  <div class="player-toolbar" style="display:none;">
+    {showSearch && (
+      <div class="player-search">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input type="search" data-search placeholder="Search channels…" autocomplete="off" />
+      </div>
+    )}
+    <span class="count" data-count></span>
+    <div class="view-toggle" role="tablist" aria-label="List layout">
+      <button class="vt-btn" data-view="list" type="button" role="tab" aria-label="List">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <button class="vt-btn" data-view="grid" type="button" role="tab" aria-label="Grid">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/>
+          <rect x="14" y="3" width="7" height="7"/>
+          <rect x="3" y="14" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  {mode === 'browse' && <div class="genre-filters" data-categories style="display:none;"></div>}
+  {mode === 'browse' && <div class="genre-filters" data-countries style="display:none;"></div>}
+
+  <div class="player-loading" data-status>
+    <div class="spinner"></div>
+    <p>Loading channels…</p>
+  </div>
+
+  <div class="stations" data-stations></div>
+
+  <nav class="pagination" data-pagination hidden aria-label="Channel pages"></nav>
+</div>
+
+<!-- Mini bar -->
+<div class="now-playing" data-now-playing aria-live="polite">
+  <div class="np-info">
+    <div class="np-logo" data-np-logo></div>
+    <div class="np-text">
+      <div class="np-name" data-np-name></div>
+      <div class="np-state" data-np-state></div>
+    </div>
+  </div>
+  <button class="np-btn np-secondary" data-np-prev type="button" aria-label="Previous channel">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12l8.5 6V6z"/></svg>
+  </button>
+  <button class="np-btn np-primary" data-np-toggle type="button" aria-label="Play">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+  </button>
+  <button class="np-btn np-secondary" data-np-next type="button" aria-label="Next channel">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+  </button>
+  <button class="np-btn np-expand" data-np-expand type="button" aria-label="Open player">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M4 14v6h6M20 10V4h-6M4 20l7-7M20 4l-7 7"/>
+    </svg>
+  </button>
+</div>
+
+<!-- TV player modal -->
+<div class="player-modal" data-modal role="dialog" aria-modal="true" aria-label="TV player">
+  <div class="modal-tv">
+    <header class="modal-head">
+      <button class="modal-icon-btn" data-modal-close type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+      </button>
+      <div class="modal-title">
+        <span class="brand-dot">●</span>
+        WORLD TV CHANNELS
+      </div>
+      <button class="modal-icon-btn fav-modal" data-modal-fav type="button" aria-label="Add to favorites" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.3l-5.4 3.2 1.4-6.1L3 10.4l6.2-.5L12 4l2.8 5.9 6.2.5-5 4 1.4 6.1z"/></svg>
+      </button>
+    </header>
+
+    <div class="tv-screen">
+      <video data-video playsinline preload="none"></video>
+      <div class="tv-overlay" data-tv-overlay>
+        <div class="spinner"></div>
+        <span data-tv-overlay-text></span>
+      </div>
+      <div class="tv-logo" data-tv-logo></div>
+    </div>
+
+    <div class="tv-meta">
+      <div class="tv-name" data-modal-name></div>
+      <div class="tv-sub" data-modal-sub></div>
+    </div>
+
+    <div class="modal-state" data-modal-state></div>
+
+    <div class="tag-chips" data-modal-tags></div>
+
+    <div class="modal-controls">
+      <button class="modal-step-btn" data-modal-prev type="button" aria-label="Previous channel">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zM9.5 12l8.5 6V6z"/></svg>
+      </button>
+      <button class="big-btn" data-modal-toggle type="button" aria-label="Play">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="modal-step-btn" data-modal-next type="button" aria-label="Next channel">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg>
+      </button>
+      <button class="modal-step-btn" data-modal-fullscreen type="button" aria-label="Fullscreen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+    </div>
+
+    <div class="volume-row">
+      <svg viewBox="0 0 24 24" fill="currentColor" class="vol-icon">
+        <path d="M3 10v4h4l5 4V6L7 10H3z"/>
+      </svg>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        data-modal-volume
+        aria-label="Volume"
+      />
+      <svg viewBox="0 0 24 24" fill="currentColor" class="vol-icon">
+        <path d="M3 10v4h4l5 4V6L7 10H3zm11.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+      </svg>
+    </div>
+
+    <div class="modal-actions">
+      <button class="action-btn" data-modal-share type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+        <span data-share-label>Share</span>
+      </button>
+      <div class="sleep-wrap">
+        <button class="action-btn" data-sleep-toggle type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          <span data-sleep-label>Sleep timer</span>
+        </button>
+        <div class="sleep-options" data-sleep-options hidden>
+          <button type="button" data-sleep-min="15">15 min</button>
+          <button type="button" data-sleep-min="30">30 min</button>
+          <button type="button" data-sleep-min="60">60 min</button>
+          <button type="button" data-sleep-min="90">90 min</button>
+          <button type="button" data-sleep-min="0">Off</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  import '../scripts/player.ts';
+</script>

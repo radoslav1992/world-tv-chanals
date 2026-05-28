@@ -22,9 +22,9 @@ interface Props {
   articleTags?: string[];
 }
 
-const SITE_URL = 'https://bulgariaradio.com';
-const SITE_NAME = 'Радио България';
-const DEFAULT_DESC = 'Слушай безплатно над 100 български радио станции онлайн — поп, рок, фолк, дип хаус и още. Директно в браузъра, без регистрация.';
+const SITE_URL = 'https://worldtvchannels.org';
+const SITE_NAME = 'World TV Channels';
+const DEFAULT_DESC = 'Watch thousands of live TV channels from around the world for free — news, sport, movies, music and more. Straight in your browser, no sign-up.';
 
 const {
   title,
@@ -56,12 +56,12 @@ const orgJsonLd = {
 const jsonLdArr = [orgJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
 ---
 <!doctype html>
-<html lang="bg">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#ece5d8" />
+    <meta name="theme-color" content="#0f1320" />
     <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large'} />
     <meta name="format-detection" content="telephone=no" />
     <link rel="canonical" href={canonical} />
@@ -75,7 +75,7 @@ const jsonLdArr = [orgJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [js
     <meta property="og:image" content={ogImageAbs} />
     <meta property="og:image:width" content="512" />
     <meta property="og:image:height" content="512" />
-    <meta property="og:locale" content="bg_BG" />
+    <meta property="og:locale" content="en_US" />
     {publishedTime && <meta property="article:published_time" content={publishedTime} />}
     {articleAuthor && <meta property="article:author" content={articleAuthor} />}
     {articleTags.map((tag) => <meta property="article:tag" content={tag} />)}
@@ -93,7 +93,7 @@ const jsonLdArr = [orgJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [js
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
 
@@ -121,7 +121,7 @@ const jsonLdArr = [orgJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [js
     <title>{title}</title>
   </head>
   <body>
-    <a href="#main" class="skip-link">Към основното съдържание</a>
+    <a href="#main" class="skip-link">Skip to main content</a>
 
     <div class="flag-bar"><div class="w"></div><div class="g"></div><div class="r"></div></div>
 
@@ -129,19 +129,19 @@ const jsonLdArr = [orgJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [js
       <div class="container row">
         <a class="brand" href="/">
           <img src="/logo.png" alt="" width="40" height="40" />
-          <span class="brand-name">Радио България</span>
+          <span class="brand-name">World TV Channels</span>
         </a>
-        <button class="nav-toggle" type="button" aria-label="Меню" aria-expanded="false" aria-controls="main-nav">
+        <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="main-nav">
           <span></span><span></span><span></span>
         </button>
         <nav class="site" id="main-nav">
-          <a href="/" class:list={{ active: isActive('/') }}>Слушай</a>
-          <a href="/favorites" class:list={{ active: isActive('/favorites') }}>Любими</a>
-          <a href="/history" class:list={{ active: isActive('/history') }}>История</a>
-          <a href="/stations" class:list={{ active: path.startsWith('/stations') }}>Станции</a>
-          <a href="/blog" class:list={{ active: path.startsWith('/blog') }}>Блог</a>
-          <a href="/about" class:list={{ active: isActive('/about') }}>За нас</a>
-          <a href="/contact" class:list={{ active: isActive('/contact') }}>Контакт</a>
+          <a href="/" class:list={{ active: isActive('/') }}>Watch</a>
+          <a href="/favorites" class:list={{ active: isActive('/favorites') }}>Favorites</a>
+          <a href="/history" class:list={{ active: isActive('/history') }}>History</a>
+          <a href="/channels" class:list={{ active: path.startsWith('/channels') }}>Channels</a>
+          <a href="/blog" class:list={{ active: path.startsWith('/blog') }}>Blog</a>
+          <a href="/about" class:list={{ active: isActive('/about') }}>About</a>
+          <a href="/contact" class:list={{ active: isActive('/contact') }}>Contact</a>
         </nav>
       </div>
     </header>
@@ -155,33 +155,33 @@ const jsonLdArr = [orgJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [js
         <div class="footer-col footer-brand">
           <div class="brand">
             <img src="/logo.png" alt="" width="36" height="36" />
-            <span>Радио България</span>
+            <span>World TV Channels</span>
           </div>
-          <p>Безплатен достъп до български радио станции — директно в браузъра. Android приложение очаквайте скоро.</p>
+          <p>Free access to thousands of live TV channels from around the world — straight in your browser.</p>
         </div>
         <div class="footer-col">
-          <h4>Приложение</h4>
-          <a href="/">Слушай онлайн</a>
-          <a href="/favorites">Любими</a>
-          <a href="/history">История</a>
+          <h4>Watch</h4>
+          <a href="/">Watch online</a>
+          <a href="/favorites">Favorites</a>
+          <a href="/history">History</a>
         </div>
         <div class="footer-col">
-          <h4>Информация</h4>
-          <a href="/stations">Станции</a>
-          <a href="/blog">Блог</a>
-          <a href="/about">За нас</a>
-          <a href="/contact">Контакт</a>
-          <a href="/sitemap-index.xml">Карта на сайта</a>
+          <h4>Explore</h4>
+          <a href="/channels">Channels</a>
+          <a href="/blog">Blog</a>
+          <a href="/about">About</a>
+          <a href="/contact">Contact</a>
+          <a href="/sitemap-index.xml">Sitemap</a>
         </div>
         <div class="footer-col">
-          <h4>Правни</h4>
-          <a href="/privacy-policy">Поверителност</a>
-          <a href="/terms">Условия</a>
+          <h4>Legal</h4>
+          <a href="/privacy-policy">Privacy</a>
+          <a href="/terms">Terms</a>
         </div>
       </div>
       <div class="container footer-bottom">
-        <span>© 2026 Радио България. Всички права запазени.</span>
-        <span class="footer-credit">Станциите се предоставят от <a href="https://www.radio-browser.info" target="_blank" rel="noopener noreferrer">Radio Browser</a>.</span>
+        <span>© 2026 World TV Channels. All rights reserved.</span>
+        <span class="footer-credit">Channel data provided by <a href="https://github.com/iptv-org/iptv" target="_blank" rel="noopener noreferrer">iptv-org</a>.</span>
       </div>
     </footer>
 
@@ -191,16 +191,16 @@ const jsonLdArr = [orgJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [js
     <div class="consent" data-consent hidden>
       <div class="consent-inner container">
         <div class="consent-text">
-          <strong>Този сайт използва бисквитки</strong>
+          <strong>This site uses cookies</strong>
           <p>
-            Използваме само технически необходими бисквитки, за да запомним избора ви
-            (плейър, любими, изглед). Повече в
-            <a href="/privacy-policy">Политиката за поверителност</a>.
+            We use only technically necessary storage to remember your choices
+            (player, favorites, layout). Learn more in our
+            <a href="/privacy-policy">Privacy Policy</a>.
           </p>
         </div>
         <div class="consent-actions">
-          <button type="button" class="cta-secondary" data-consent-reject>Само необходимите</button>
-          <button type="button" class="cta" data-consent-accept>Приемам</button>
+          <button type="button" class="cta-secondary" data-consent-reject>Necessary only</button>
+          <button type="button" class="cta" data-consent-accept>Accept</button>
         </div>
       </div>
     </div>
@@ -208,7 +208,7 @@ const jsonLdArr = [orgJsonLd, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [js
     <script>
       // Cookie consent: hide if a choice was already made; persist on click.
       (() => {
-        const KEY = 'br-consent-v1';
+        const KEY = 'wtv-consent-v1';
         const banner = document.querySelector('[data-consent]') as HTMLElement | null;
         if (!banner) return;
         if (localStorage.getItem(KEY)) return;

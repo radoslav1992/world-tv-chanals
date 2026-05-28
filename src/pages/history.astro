@@ -1,14 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
-import RadioPlayer from '../components/RadioPlayer.astro';
+import ChannelPlayer from '../components/ChannelPlayer.astro';
 ---
-<Base title="Дневник — Радио България" description="Последно слушаните български радио станции. Върнете се бързо към станция, която сте чули наскоро." noindex={true}>
+<Base title="Watch history — World TV Channels" description="The TV channels you watched most recently. Jump back to a channel you saw earlier." noindex={true}>
   <section class="container page-head">
-    <h1>Дневник</h1>
-    <p class="page-sub">Последно слушаните станции.</p>
+    <h1>Watch history</h1>
+    <p class="page-sub">The channels you watched recently.</p>
   </section>
 
   <section class="container player-section">
-    <RadioPlayer mode="history" showSearch={true} />
+    <ChannelPlayer mode="history" showSearch={true} />
   </section>
 </Base>

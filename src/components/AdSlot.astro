@@ -15,7 +15,7 @@ interface Props {
   /** Replace with your real ad-slot ID after AdSense approval. */
   slotId?: string;
 }
-const { label = 'Реклама', format = 'horizontal', slotId = 'XXXXXXXXXX' } = Astro.props;
+const { label = 'Advertisement', format = 'horizontal', slotId = 'XXXXXXXXXX' } = Astro.props;
 ---
 <div class={`ad-slot ad-${format}`} data-ad-slot={slotId} role="complementary" aria-label={label}>
   <div class="ad-placeholder">

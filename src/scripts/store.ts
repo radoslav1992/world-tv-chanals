@@ -1,33 +1,33 @@
-// localStorage-backed store for favorites and listen history.
-// Stations are cached as full objects so /favorites and /history can
-// render without re-fetching from Radio Browser.
+// localStorage-backed store for favorite channels and watch history.
+// Channels are cached as full objects so /favorites and /history can render
+// without re-fetching from the iptv-org API.
 
-export interface Station {
-  stationuuid: string;
+export interface Channel {
+  id: string;
   name: string;
-  url_resolved: string;
-  favicon: string;
-  tags: string;
-  codec: string;
-  bitrate: number;
-  hls: number;
+  url: string;
+  logo: string;
+  /** Comma-separated category display names. */
+  categories: string;
+  /** Country display name. */
   country: string;
-  state: string;
-  language: string;
-  votes: number;
+  countryCode: string;
+  flag: string;
+  languages: string;
+  network: string;
 }
 
 export interface HistoryEntry {
-  station: Station;
-  playedAt: number; // ms timestamp
+  channel: Channel;
+  watchedAt: number; // ms timestamp
 }
 
-const FAV_KEY = 'br-favorites';
-const HIST_KEY = 'br-history';
-const MAX_FAVORITES = 200;
+const FAV_KEY = 'wtv-favorites';
+const HIST_KEY = 'wtv-history';
+const MAX_FAVORITES = 300;
 const MAX_HISTORY = 50;
 
-export const STORE_EVENT = 'br:store-changed';
+export const STORE_EVENT = 'wtv:store-changed';
 
 type ChangeKind = 'favorites' | 'history';
 
@@ -56,32 +56,32 @@ function writeJson<T>(key: string, value: T) {
 
 // ----- Favorites -----
 
-export function getFavorites(): Station[] {
-  return readJson<Station[]>(FAV_KEY, []);
+export function getFavorites(): Channel[] {
+  return readJson<Channel[]>(FAV_KEY, []);
 }
 
-export function isFavorite(stationuuid: string): boolean {
-  return getFavorites().some((s) => s.stationuuid === stationuuid);
+export function isFavorite(id: string): boolean {
+  return getFavorites().some((c) => c.id === id);
 }
 
-export function toggleFavorite(station: Station): boolean {
+export function toggleFavorite(channel: Channel): boolean {
   const favs = getFavorites();
-  const idx = favs.findIndex((s) => s.stationuuid === station.stationuuid);
+  const idx = favs.findIndex((c) => c.id === channel.id);
   if (idx >= 0) {
     favs.splice(idx, 1);
     writeJson(FAV_KEY, favs);
     emit('favorites');
     return false;
   }
-  favs.unshift(station);
+  favs.unshift(channel);
   if (favs.length > MAX_FAVORITES) favs.length = MAX_FAVORITES;
   writeJson(FAV_KEY, favs);
   emit('favorites');
   return true;
 }
 
-export function removeFavorite(stationuuid: string) {
-  const favs = getFavorites().filter((s) => s.stationuuid !== stationuuid);
+export function removeFavorite(id: string) {
+  const favs = getFavorites().filter((c) => c.id !== id);
   writeJson(FAV_KEY, favs);
   emit('favorites');
 }
@@ -92,11 +92,10 @@ export function getHistory(): HistoryEntry[] {
   return readJson<HistoryEntry[]>(HIST_KEY, []);
 }
 
-export function addToHistory(station: Station) {
+export function addToHistory(channel: Channel) {
   const hist = getHistory();
-  // De-dupe: remove any previous entry for this station, then prepend fresh.
-  const filtered = hist.filter((e) => e.station.stationuuid !== station.stationuuid);
-  filtered.unshift({ station, playedAt: Date.now() });
+  const filtered = hist.filter((e) => e.channel.id !== channel.id);
+  filtered.unshift({ channel, watchedAt: Date.now() });
   if (filtered.length > MAX_HISTORY) filtered.length = MAX_HISTORY;
   writeJson(HIST_KEY, filtered);
   emit('history');

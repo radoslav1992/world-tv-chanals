@@ -14,7 +14,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, remarkPluginFrontmatter } = await post.render();
 
-const SITE_URL = 'https://bulgariaradio.com';
+const SITE_URL = 'https://worldtvchannels.org';
 
 const body = post.body || '';
 const wordCount = body.split(/\s+/).filter(Boolean).length;
@@ -33,7 +33,7 @@ const jsonLd = {
   },
   publisher: {
     '@type': 'Organization',
-    name: 'Радио България',
+    name: 'World TV Channels',
     logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo.png` },
   },
   mainEntityOfPage: {
@@ -42,12 +42,12 @@ const jsonLd = {
   },
   image: `${SITE_URL}/logo.png`,
   wordCount,
-  inLanguage: 'bg',
+  inLanguage: 'en',
   keywords: post.data.tags.join(', '),
 };
 ---
 <Base
-  title={`${post.data.title} — Радио България`}
+  title={`${post.data.title} — World TV Channels`}
   description={post.data.description}
   ogType="article"
   jsonLd={jsonLd}
@@ -56,8 +56,8 @@ const jsonLd = {
   articleTags={post.data.tags}
 >
   <Breadcrumbs crumbs={[
-    { label: 'Начало', href: '/' },
-    { label: 'Блог', href: '/blog' },
+    { label: 'Home', href: '/' },
+    { label: 'Blog', href: '/blog' },
     { label: post.data.title },
   ]} />
 
@@ -65,23 +65,23 @@ const jsonLd = {
     <h1>{post.data.title}</h1>
     <p class="updated">
       <time datetime={post.data.date}>
-        {new Date(post.data.date).toLocaleDateString('bg-BG', {
+        {new Date(post.data.date).toLocaleDateString('en-US', {
           year: 'numeric',
           month: 'long',
           day: 'numeric',
         })}
       </time>
       {post.data.author && <span> · {post.data.author}</span>}
-      <span> · {readingTime} мин. четене</span>
+      <span> · {readingTime} min read</span>
     </p>
 
     <Content />
 
     <div class="blog-cta">
-      <p>Искате да чуете тези станции на живо?</p>
+      <p>Want to watch these channels live?</p>
       <div class="hero-ctas">
-        <a class="cta cta-secondary" href="/#player">Слушай онлайн</a>
-        <a class="cta cta-secondary" href="/blog">Всички статии</a>
+        <a class="cta cta-secondary" href="/#player">Watch online</a>
+        <a class="cta cta-secondary" href="/blog">All articles</a>
       </div>
     </div>
   </article>

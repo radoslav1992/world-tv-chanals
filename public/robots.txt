@@ -3,4 +3,4 @@ Allow: /
 Disallow: /favorites
 Disallow: /history
 
-Sitemap: https://bulgariaradio.com/sitemap-index.xml
+Sitemap: https://worldtvchannels.org/sitemap-index.xml

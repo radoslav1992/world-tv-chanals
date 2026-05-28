@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Feature from '../components/Feature.astro';
-import RadioPlayer from '../components/RadioPlayer.astro';
+import ChannelPlayer from '../components/ChannelPlayer.astro';
 import { getCollection } from 'astro:content';
 
 const latestPosts = (await getCollection('blog'))
@@ -10,81 +10,77 @@ const latestPosts = (await getCollection('blog'))
 
 const features = [
   {
-    title: 'Стотици станции',
-    description: 'Над 100 български радио станции на едно място — поп, рок, фолк, дип хаус, новини, спорт и още.',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 11h16M4 16h16M9 7l3-3 3 3"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/></svg>',
+    title: 'Thousands of channels',
+    description: 'Live TV channels from around the world in one place — news, sport, movies, music, kids, documentaries and more.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 3l4 4 4-4"/></svg>',
   },
   {
-    title: 'Любими станции',
-    description: 'Запази любимите си с един клик и им се радвай в собствен раздел. Бърз достъп до това, което слушаш най-често.',
+    title: 'Favorite channels',
+    description: 'Save the channels you love with one tap and find them again in your own section. Quick access to what you watch most.',
     icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.3l-5.4 3.2 1.4-6.1L3 10.4l6.2-.5L12 4l2.8 5.9 6.2.5-5 4 1.4 6.1z"/></svg>',
   },
   {
-    title: 'История на слушане',
-    description: 'Виж последно слушаните станции и се върни към тях с едно докосване. Никога не губи интересна станция.',
+    title: 'Watch history',
+    description: 'See the channels you watched recently and jump back to them in a single tap. Never lose an interesting channel.',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   },
   {
-    title: 'Безплатно и просто',
-    description: 'Без регистрация, без абонамент, без скрити такси. Отвори, избери станция, слушай.',
+    title: 'Free and simple',
+    description: 'No registration, no subscription, no hidden fees. Open it, pick a channel, watch.',
     icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 7"/></svg>',
   },
   {
-    title: 'Работи в фон',
-    description: 'Продължава да свири, докато ползваш други приложения или заключиш екрана. Управление от заключения екран.',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="3" width="12" height="18" rx="2"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg>',
+    title: 'Filter by country & category',
+    description: 'Narrow thousands of channels down to exactly what you want — filter by country or by category in a click.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 5h18M6 12h12M10 19h4"/></svg>',
   },
   {
-    title: 'Малко място',
-    description: 'Приложението е лековато и не товари батерията. Без излишни разрешения.',
-    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M3 12h18"/></svg>',
+    title: 'Works in any browser',
+    description: 'Plays straight in your browser on desktop and mobile — no app to install, no set-top box, no dish.',
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>',
   },
 ];
 
 const faqs = [
   {
-    q: 'Безплатно ли е?',
-    a: 'Да, напълно безплатно — и уеб плейърът, и бъдещото мобилно приложение. Няма абонамент, няма пробен период, няма скрити такси.',
+    q: 'Is it free?',
+    a: 'Yes, completely free. There is no subscription, no trial period and no hidden fees — just open the site and start watching.',
   },
   {
-    q: 'Откъде идват радио станциите?',
-    a: 'Каталогът се захранва от Radio Browser — отворена, общностно поддържана база данни с радио станции от целия свят. Самите потоци се излъчват от съответните радиа.',
+    q: 'Where do the channels come from?',
+    a: 'The catalogue is powered by iptv-org, an open, community-maintained collection of publicly available TV streams from around the world. The broadcasts themselves are delivered by the respective channels.',
   },
   {
-    q: 'Трябва ли да създавам акаунт?',
-    a: 'Не. Просто отворете сайта и започнете да слушате. Любимите станции и историята се пазят локално в браузъра ви.',
+    q: 'Do I need to create an account?',
+    a: 'No. Just open the site and start watching. Your favorite channels and history are stored locally in your browser.',
   },
   {
-    q: 'Колко мобилни данни ползва?',
-    a: 'Типично 60–120 MB на час, в зависимост от качеството на потока (повечето български станции излъчват на 96–128 kbps). При свързване с Wi-Fi не се изразходват мобилни данни.',
+    q: 'How much data does it use?',
+    a: 'Live video typically uses a few hundred megabytes to a couple of gigabytes per hour, depending on the stream quality. Streaming adapts to your connection automatically. On Wi-Fi you don’t use mobile data.',
   },
   {
-    q: 'Защо някои станции не свирят?',
-    a: 'Браузърът блокира потоци без HTTPS и без поддръжка на HLS. Затова в уеб версията виждате по-малък подсет от станциите. Бъдещото Android приложение ще поддържа всички формати.',
+    q: 'Why do some channels not play?',
+    a: 'Live streams are maintained by broadcasters and the open-source community, so they occasionally change or go offline. Browsers also block streams that aren’t served over a secure (HTTPS) connection. If a channel won’t load, simply try another one.',
   },
   {
-    q: 'Работи ли извън България?',
-    a: 'Да, приложението работи навсякъде, където има интернет. Идеално за българи в чужбина, които искат да чуят родното радио.',
+    q: 'Does it work outside my country?',
+    a: 'Yes — it works anywhere with an internet connection. Some individual streams may be geo-restricted by their broadcaster, but the vast majority are available worldwide.',
   },
   {
-    q: 'Достъпно ли е за iOS / iPhone?',
-    a: 'Мобилно приложение все още няма — работим първо по Android версията. Уеб версията на този сайт обаче работи във всеки модерен браузър, включително Safari на iOS.',
+    q: 'What technology is used to play the channels?',
+    a: 'Channels are delivered using HLS (HTTP Live Streaming) and played with the open-source hls.js library, falling back to native playback on Safari and iOS. Everything runs in your browser.',
   },
   {
-    q: 'Каква е разликата между FM радио и интернет радио?',
-    a: 'FM радиото използва радиочестоти и приемник, а интернет радиото предава звука като цифров поток през интернет. Онлайн стрийминг означава по-широк избор от станции, метаданни за песните и достъп от всяка точка на света.',
+    q: 'Is it available on iOS / Android?',
+    a: 'There is no separate mobile app — the website works in any modern mobile browser, including Safari on iOS and Chrome on Android.',
   },
   {
-    q: 'Мога ли да слушам радио без интернет?',
-    a: 'За интернет радиото е необходима интернет връзка — мобилни данни или Wi-Fi. Ако искате да слушате офлайн, единствената алтернатива засега е класическо FM радио с физически приемник.',
+    q: 'How do I add a channel that’s missing?',
+    a: 'The catalogue comes from the open iptv-org project. You can suggest a new channel or stream directly on the iptv-org GitHub repository, where the community reviews additions.',
   },
   {
-    q: 'Как мога да добавя станция, която липсва?',
-    a: 'Каталогът се захранва от Radio Browser — отворена общностна база данни. Можете да предложите нова станция директно на radio-browser.info или да ни пишете през страницата за контакт с URL на потока.',
-  },
-  {
-    q: 'Безопасно ли е за деца?',
-    a: 'Сайтът е предназначен за потребители на 13+ години. Самото съдържание на радиостанциите е на живо и не се контролира от нас — препоръчваме родителски контрол при по-малки деца.',
+    q: 'Is it safe for children?',
+    a: 'Adult (NSFW) channels are filtered out of the catalogue. That said, live TV content is not controlled by us, so we recommend parental supervision for younger viewers.',
   },
 ];
 
@@ -92,12 +88,12 @@ const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'Радио България',
-    browserRequirements: 'Requires a modern browser with HTML5 audio support',
+    name: 'World TV Channels',
+    browserRequirements: 'Requires a modern browser with HTML5 video support',
     applicationCategory: 'MultimediaApplication',
-    description: 'Безплатен уеб плейър за български радио станции онлайн. Android приложение — очаквайте скоро.',
-    inLanguage: 'bg',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'BGN' },
+    description: 'Free web player for thousands of live TV channels from around the world.',
+    inLanguage: 'en',
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   },
   {
     '@context': 'https://schema.org',
@@ -111,100 +107,84 @@ const jsonLd = [
   {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Радио България',
-    url: 'https://bulgariaradio.com',
-    inLanguage: 'bg',
+    name: 'World TV Channels',
+    url: 'https://worldtvchannels.org',
+    inLanguage: 'en',
     potentialAction: {
       '@type': 'SearchAction',
-      target: 'https://bulgariaradio.com/#player',
+      target: 'https://worldtvchannels.org/#player',
       'query-input': 'required name=search_term_string',
     },
   },
 ];
 ---
 <Base
-  title="Радио България — Български радио станции онлайн"
-  description="Слушай безплатно над 100 български радио станции — поп, рок, фолк, дип хаус, новини. Директно в браузъра, без регистрация. Android приложение — очаквайте скоро."
+  title="World TV Channels — Watch live TV from around the world, free"
+  description="Watch thousands of live TV channels from around the world for free — news, sport, movies, music and more. Straight in your browser, no sign-up."
   jsonLd={jsonLd}
 >
   <section class="hero container">
-    <img class="hero-logo" src="/logo.png" alt="Радио България — лого" width="160" height="160" />
-    <h1>Радио България</h1>
+    <img class="hero-logo" src="/logo.png" alt="World TV Channels logo" width="160" height="160" />
+    <h1>World TV Channels</h1>
     <p class="tagline">
-      Слушай безплатно над 100 български радио станции — поп, рок, фолк, дип хаус, новини и още.
-      Директно в браузъра, без регистрация.
+      Watch thousands of live TV channels from around the world — news, sport, movies, music and more.
+      Free, straight in your browser, no sign-up.
     </p>
     <div class="hero-ctas">
       <a class="cta" href="#player">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Слушай онлайн
+        Start watching
       </a>
-      <span class="cta cta-coming-soon" id="download">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 20.5V3.5c0-.6.3-1.1.8-1.4L13.5 12 3.8 21.9c-.5-.3-.8-.8-.8-1.4zm10.6-8.5l2.5-2.5L5.5 3.4c-.3-.2-.6-.3-.9-.3l9 8.9zm6.5-3.7L17.5 9.7l-2.7 2.3 2.7 2.3 2.6-1.4c.8-.5.8-1.7 0-2.1zM4.6 20.9c.3 0 .6-.1.9-.3l10.6-6.1-2.5-2.5-9 8.9z"/></svg>
-        Android — очаквайте скоро
-      </span>
+      <a class="cta cta-secondary" href="/channels">Browse channel guide</a>
     </div>
-    <ul class="trust-row" aria-label="Кратки факти">
-      <li><strong>100+</strong> станции</li>
-      <li><strong>0 лв</strong> безплатно</li>
-      <li><strong>Без</strong> регистрация</li>
+    <ul class="trust-row" aria-label="Quick facts">
+      <li><strong>1000s</strong> of channels</li>
+      <li><strong>Free</strong> no subscription</li>
+      <li><strong>No</strong> sign-up</li>
     </ul>
   </section>
 
   <section id="player" class="container player-section">
     <div class="section-head">
-      <h2>Слушай на живо</h2>
-      <p>Истински български радио станции, директно в браузъра — без инсталация, без регистрация.</p>
+      <h2>Watch live</h2>
+      <p>Live TV channels from around the world, straight in your browser — no install, no sign-up.</p>
     </div>
-    <RadioPlayer />
+    <ChannelPlayer />
   </section>
 
   <section id="features" class="container">
     <div class="section-head">
-      <h2>Защо Радио България</h2>
-      <p>Всичко необходимо, за да слушаш българско радио — без излишни функции.</p>
+      <h2>Why World TV Channels</h2>
+      <p>Everything you need to watch global TV — without the clutter.</p>
     </div>
     <div class="features features-six">
       {features.map((f) => <Feature title={f.title} description={f.description} icon={f.icon} />)}
     </div>
   </section>
 
-  <section class="container">
-    <div class="section-head">
-      <h2>Така изглежда приложението</h2>
-      <p>Просто, чисто и в твоя стил.</p>
-    </div>
-    <div class="screenshots">
-      <img src="/screenshots/home.png" alt="Списък с български радио станции" loading="lazy" width="1080" height="2404" />
-      <img src="/screenshots/favorites.png" alt="Любими станции" loading="lazy" width="1080" height="2404" />
-      <img src="/screenshots/history.png" alt="История на слушане" loading="lazy" width="1080" height="2404" />
-      <img src="/screenshots/player.png" alt="Ретро плейър със зелен скалател" loading="lazy" width="1080" height="2404" />
-    </div>
-  </section>
-
   <section class="container about-strip">
     <div class="section-head">
-      <h2>Кратко за нас</h2>
+      <h2>About the project</h2>
     </div>
     <div class="prose">
       <p>
-        Радио България е малък независим проект, чиято цел е да направи родното радио лесно достъпно
-        — на всяко устройство, навсякъде по света. Приложението е направено от любители на българската
-        музика и не е свързано с конкретна радиостанция или медийна група.
+        World TV Channels is a small independent project with one goal: to make the world’s television
+        easy to watch — on any device, anywhere. It’s built by people who love TV and isn’t affiliated
+        with any particular broadcaster or media group.
       </p>
       <p>
-        Каталогът се захранва от <a href="https://www.radio-browser.info" target="_blank" rel="noopener noreferrer">Radio Browser</a>
-        — отворена, общностно поддържана база данни. Самото съдържание (музика, новини, реклами)
-        принадлежи на съответните радиа.
+        The catalogue is powered by <a href="https://github.com/iptv-org/iptv" target="_blank" rel="noopener noreferrer">iptv-org</a>
+        — an open, community-maintained collection of publicly available streams. The broadcasts
+        themselves (programmes, news, ads) belong to the respective channels.
       </p>
-      <p><a class="link-arrow" href="/about">Прочети повече за проекта →</a></p>
+      <p><a class="link-arrow" href="/about">Read more about the project →</a></p>
     </div>
   </section>
 
   <section class="container">
     <div class="section-head">
-      <h2>От блога</h2>
-      <p>Статии за българското радио, музика и полезни съвети.</p>
+      <h2>From the blog</h2>
+      <p>Articles about international TV channels, broadcasting and streaming.</p>
     </div>
     <div class="blog-grid blog-grid-home">
       {latestPosts.map((post) => (
@@ -222,14 +202,14 @@ const jsonLd = [
       ))}
     </div>
     <div style="text-align:center; margin-top:1.5rem;">
-      <a class="link-arrow" href="/blog">Всички статии →</a>
+      <a class="link-arrow" href="/blog">All articles →</a>
     </div>
   </section>
 
   <section id="faq" class="container">
     <div class="section-head">
-      <h2>Често задавани въпроси</h2>
-      <p>Кратки отговори на най-честите въпроси за приложението.</p>
+      <h2>Frequently asked questions</h2>
+      <p>Short answers to the most common questions about the app.</p>
     </div>
     <div class="faq">
       {faqs.map((f) => (
@@ -242,17 +222,14 @@ const jsonLd = [
   </section>
 
   <section class="container cta-section">
-    <h2>Готов за слушане?</h2>
-    <p>Пуснете любимата си станция директно в браузъра — безплатно и без регистрация.</p>
+    <h2>Ready to watch?</h2>
+    <p>Pick a channel and start watching straight in your browser — free and without sign-up.</p>
     <div class="hero-ctas">
       <a class="cta" href="#player">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Слушай онлайн
+        Start watching
       </a>
-      <span class="cta cta-coming-soon">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 20.5V3.5c0-.6.3-1.1.8-1.4L13.5 12 3.8 21.9c-.5-.3-.8-.8-.8-1.4zm10.6-8.5l2.5-2.5L5.5 3.4c-.3-.2-.6-.3-.9-.3l9 8.9zm6.5-3.7L17.5 9.7l-2.7 2.3 2.7 2.3 2.6-1.4c.8-.5.8-1.7 0-2.1zM4.6 20.9c.3 0 .6-.1.9-.3l10.6-6.1-2.5-2.5-9 8.9z"/></svg>
-        Android — очаквайте скоро
-      </span>
+      <a class="cta cta-secondary" href="/channels">Browse channel guide</a>
     </div>
   </section>
 </Base>

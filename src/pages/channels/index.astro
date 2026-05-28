@@ -1,0 +1,67 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getCollection } from 'astro:content';
+
+const channels = (await getCollection('channels'))
+  .sort((a, b) => a.data.name.localeCompare(b.data.name, 'en'));
+
+const SITE_URL = 'https://worldtvchannels.org';
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'TV channel guide',
+    description: 'A guide to major international TV channels — history, ownership, programming and where to watch.',
+    inLanguage: 'en',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'International TV channels',
+    numberOfItems: channels.length,
+    itemListElement: channels.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.data.name,
+      url: `${SITE_URL}/channels/${c.slug}`,
+    })),
+  },
+];
+---
+<Base
+  title="TV channel guide — World TV Channels"
+  description="A guide to major international TV channels — history, ownership, programming and where to watch the biggest networks from Europe and the US."
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Channels' },
+  ]} />
+
+  <section class="container blog-index">
+    <div class="section-head">
+      <h1>TV channel guide</h1>
+      <p>In-depth profiles of major international TV channels — history, ownership, programming and where to watch.</p>
+    </div>
+
+    <div class="station-directory">
+      {channels.map((channel) => (
+        <a href={`/channels/${channel.slug}`} class="blog-card">
+          <div class="blog-card-body">
+            <div class="blog-card-tags">
+              <span class="tag-chip">{channel.data.category}</span>
+              <span class="tag-chip">{channel.data.country}</span>
+            </div>
+            <h2>{channel.data.name}</h2>
+            <p>{channel.data.description}</p>
+            {channel.data.launched && (
+              <p class="station-freq">Launched {channel.data.launched}</p>
+            )}
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>

@@ -1,5 +1,5 @@
 {
-  "name": "bulgarian-radio-landing",
+  "name": "world-tv-channels",
   "type": "module",
   "version": "0.1.0",
   "private": true,
@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "11",
-    "astro": "^4.16.0"
+    "astro": "^4.16.0",
+    "hls.js": "^1.6.16"
   },
   "devDependencies": {
     "wrangler": "^4.94.0"
