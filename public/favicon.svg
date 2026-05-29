@@ -1,16 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="World TV Channels">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#14b8a6"/>
-      <stop offset="100%" stop-color="#0d9488"/>
+    <linearGradient id="fbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b2338"/>
+      <stop offset="1" stop-color="#0e1220"/>
+    </linearGradient>
+    <linearGradient id="fscreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#74a0ff"/>
+      <stop offset="1" stop-color="#3f6fe0"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <path d="M20 38A20 20 0 0 1 44 38" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".35"/>
-  <path d="M25 33A12 12 0 0 1 39 33" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".7"/>
-  <path d="M29 29A5 5 0 0 1 35 29" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="32" cy="42" r="4" fill="#fff"/>
-  <rect x="14" y="52" width="12" height="2" rx="1" fill="rgba(255,255,255,.8)"/>
-  <rect x="26" y="52" width="12" height="2" fill="#4ade80"/>
-  <rect x="38" y="52" width="12" height="2" rx="1" fill="#f87171"/>
+
+  <rect width="512" height="512" rx="104" fill="url(#fbg)"/>
+
+  <!-- screen -->
+  <rect x="74" y="138" width="364" height="236" rx="36" fill="url(#fscreen)"/>
+  <rect x="74" y="138" width="364" height="236" rx="36" fill="none" stroke="#ffffff" stroke-opacity="0.2" stroke-width="6"/>
+
+  <!-- play mark -->
+  <path d="M222 196 L222 316 L338 256 Z" fill="#ffffff"/>
 </svg>
