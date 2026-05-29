@@ -1,4 +1,5 @@
 import { getCollection } from 'astro:content';
+import { CATEGORIES, TOP_COUNTRIES } from '../lib/seo-data';
 
 export const prerender = true;
 
@@ -6,12 +7,17 @@ const SITE = 'https://worldtvchannels.org';
 
 const staticPages = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
+  { loc: '/mosaic', changefreq: 'monthly', priority: '0.8' },
+  { loc: '/category', changefreq: 'weekly', priority: '0.8' },
+  { loc: '/country', changefreq: 'weekly', priority: '0.8' },
   { loc: '/channels', changefreq: 'weekly', priority: '0.9' },
   { loc: '/blog', changefreq: 'weekly', priority: '0.9' },
   { loc: '/about', changefreq: 'monthly', priority: '0.7' },
   { loc: '/contact', changefreq: 'monthly', priority: '0.7' },
   { loc: '/privacy-policy', changefreq: 'yearly', priority: '0.5' },
   { loc: '/terms', changefreq: 'yearly', priority: '0.5' },
+  ...CATEGORIES.map((c) => ({ loc: `/category/${c.slug}`, changefreq: 'weekly', priority: '0.7' })),
+  ...TOP_COUNTRIES.map((c) => ({ loc: `/country/${c.code.toLowerCase()}`, changefreq: 'weekly', priority: '0.7' })),
 ];
 
 export async function GET() {

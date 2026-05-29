@@ -216,3 +216,27 @@ export async function getDataset(): Promise<Dataset> {
     });
   return inflight;
 }
+
+export async function getChannelById(id: string): Promise<Channel | null> {
+  if (!id) return null;
+  const { channels } = await getDataset();
+  return channels.find((c) => c.id === id) ?? null;
+}
+
+/** Channels whose category list contains the given display name (case-insensitive). */
+export async function getChannelsByCategory(name: string): Promise<Channel[]> {
+  const target = name.trim().toLowerCase();
+  if (!target) return [];
+  const { channels } = await getDataset();
+  return channels.filter((c) =>
+    c.categories.toLowerCase().split(',').map((s) => s.trim()).includes(target),
+  );
+}
+
+/** Channels for a given ISO 3166-1 alpha-2 country code (case-insensitive). */
+export async function getChannelsByCountry(code: string): Promise<Channel[]> {
+  const target = code.trim().toUpperCase();
+  if (!target) return [];
+  const { channels } = await getDataset();
+  return channels.filter((c) => c.countryCode === target);
+}

@@ -15,6 +15,16 @@ export const GET: APIRoute = async ({ url }) => {
   try {
     const { channels } = await getDataset();
 
+    // Single-channel lookup (used by shareable deep links: /?play=<id>).
+    const id = url.searchParams.get('id');
+    if (id) {
+      const match = channels.find((c) => c.id === id);
+      return new Response(
+        JSON.stringify({ items: match ? [match] : [], total: match ? 1 : 0, page: 1, totalPages: 1, limit: 1 }),
+        { headers: HEADERS },
+      );
+    }
+
     const q = (url.searchParams.get('q') || '').trim().toLowerCase();
     const category = (url.searchParams.get('category') || '').trim().toLowerCase();
     const country = (url.searchParams.get('country') || '').trim().toUpperCase();

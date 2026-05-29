@@ -1,0 +1,27 @@
+---
+import type { Channel } from '../lib/iptv';
+
+interface Props {
+  channel: Channel;
+}
+const { channel } = Astro.props;
+
+const rawInitial = channel.name.trim().charAt(0).toUpperCase();
+const initial = /[A-Z0-9]/.test(rawInitial) ? rawInitial : '•';
+const cat = (channel.categories.split(',')[0] || '').trim();
+const onerror = `this.replaceWith(Object.assign(document.createElement('span'),{className:'fallback',textContent:'${initial}'}))`;
+---
+<a class="station station-link" href={`/?play=${encodeURIComponent(channel.id)}`}>
+  <div class="station-logo">
+    {channel.logo
+      ? <img src={channel.logo} alt={`${channel.name} logo`} loading="lazy" referrerpolicy="no-referrer" onerror={onerror} />
+      : <span class="fallback">{initial}</span>}
+  </div>
+  <div class="station-meta">
+    <p class="station-name">{channel.name}</p>
+    <span class="station-tag-row">
+      {cat && <span class="station-tag">{cat}</span>}
+      {channel.flag && <span class="station-flag">{channel.flag}</span>}
+    </span>
+  </div>
+</a>
