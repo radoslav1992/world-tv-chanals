@@ -3,6 +3,10 @@ import Base from '../layouts/Base.astro';
 import Feature from '../components/Feature.astro';
 import ChannelPlayer from '../components/ChannelPlayer.astro';
 import { getCollection } from 'astro:content';
+import { CATEGORIES, TOP_COUNTRIES } from '../lib/seo-data';
+
+const topCategories = CATEGORIES.slice(0, 10);
+const topCountries = TOP_COUNTRIES.slice(0, 12);
 
 const latestPosts = (await getCollection('blog'))
   .sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime())
@@ -159,6 +163,40 @@ const jsonLd = [
     </div>
     <div class="features features-six">
       {features.map((f) => <Feature title={f.title} description={f.description} icon={f.icon} />)}
+    </div>
+  </section>
+
+  <section class="container">
+    <div class="section-head">
+      <h2>Explore the world’s TV</h2>
+      <p>Jump straight to a category or country — or watch four channels at once.</p>
+    </div>
+
+    <div class="explore-callout">
+      <div class="explore-callout-text">
+        <h3>Multi-channel mosaic</h3>
+        <p>Watch up to four live channels at the same time — perfect for breaking news, elections and live sport.</p>
+      </div>
+      <a class="cta" href="/mosaic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Open multi-view
+      </a>
+    </div>
+
+    <h3 class="explore-subhead">Popular categories</h3>
+    <div class="genre-filters">
+      {topCategories.map((c) => (
+        <a class="genre-pill" href={`/category/${c.slug}`}>{c.name}</a>
+      ))}
+      <a class="genre-pill" href="/category">All categories →</a>
+    </div>
+
+    <h3 class="explore-subhead">Popular countries</h3>
+    <div class="genre-filters">
+      {topCountries.map((c) => (
+        <a class="genre-pill" href={`/country/${c.code.toLowerCase()}`}>{c.name}</a>
+      ))}
+      <a class="genre-pill" href="/country">All countries →</a>
     </div>
   </section>
 

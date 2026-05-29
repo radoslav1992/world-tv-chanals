@@ -1,0 +1,57 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getDataset } from '../../lib/iptv';
+import { CATEGORIES } from '../../lib/seo-data';
+
+export const prerender = false;
+
+const SITE_URL = 'https://worldtvchannels.org';
+
+let facets: { id: string; name: string; count: number }[] = [];
+try {
+  const ds = await getDataset();
+  facets = ds.categories;
+} catch { /* graceful */ }
+
+const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+// Prefer live facets; fall back to the curated set when the feed is unavailable.
+const items = facets.length
+  ? facets.map((f) => ({ slug: slugify(f.name), name: f.name, count: f.count }))
+  : CATEGORIES.map((c) => ({ slug: c.slug, name: c.name, count: 0 }));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'TV channels by category',
+  description: 'Browse live TV channels by category — news, sports, movies, music, kids and more.',
+  inLanguage: 'en',
+  url: `${SITE_URL}/category`,
+};
+---
+<Base
+  title="Browse TV channels by category — World TV Channels"
+  description="Browse thousands of live TV channels by category — news, sports, movies, music, kids, documentaries and more. Free to watch online."
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[{ label: 'Home', href: '/' }, { label: 'Categories' }]} />
+
+  <section class="container blog-index">
+    <div class="section-head">
+      <h1>TV channels by category</h1>
+      <p>Pick a category to explore live channels from around the world — then watch instantly in your browser.</p>
+    </div>
+
+    <div class="facet-grid">
+      {items.map((c) => (
+        <a class="facet-card" href={`/category/${c.slug}`}>
+          <span class="facet-name">{c.name}</span>
+          {c.count > 0 && <span class="facet-count">{c.count.toLocaleString('en')} channels</span>}
+        </a>
+      ))}
+    </div>
+
+    <p style="margin-top:2rem;"><a class="link-arrow" href="/country">Browse by country →</a></p>
+  </section>
+</Base>

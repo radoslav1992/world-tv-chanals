@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+
+const cells = [0, 1, 2, 3];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Multi-channel mosaic — World TV Channels',
+  applicationCategory: 'MultimediaApplication',
+  description: 'Watch up to four live TV channels at once in a 2×2 grid. Free, in your browser.',
+  inLanguage: 'en',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+};
+---
+<Base
+  title="Multi-channel mosaic — watch 4 TV channels at once | World TV Channels"
+  description="Watch up to four live TV channels at the same time in a 2×2 grid. Perfect for following breaking news, sport or elections across networks — free, in your browser."
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Multi-view' },
+  ]} />
+
+  <section class="container page-head">
+    <h1>Multi-channel mosaic</h1>
+    <p class="page-sub">
+      Watch up to four channels at once. Pick a channel for each pane, then tap a pane to switch its sound.
+      Great for breaking news, election nights and live sport across networks.
+    </p>
+  </section>
+
+  <section class="container mosaic-section">
+    <div class="mosaic-grid" data-mosaic>
+      {cells.map((i) => (
+        <div class="mosaic-cell" data-cell={i}>
+          <video data-cell-video playsinline muted preload="none"></video>
+          <div class="cell-empty" data-cell-empty>
+            <button class="cell-add" data-cell-add type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+              Add channel
+            </button>
+          </div>
+          <div class="cell-status" data-cell-status hidden></div>
+          <div class="cell-bar" data-cell-bar hidden>
+            <span class="cell-name" data-cell-name></span>
+            <div class="cell-actions">
+              <button class="cell-btn" data-cell-mute type="button" aria-label="Toggle sound" title="Sound">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 10v4h4l5 4V6L7 10H3zm11.5 2c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+              </button>
+              <button class="cell-btn" data-cell-fs type="button" aria-label="Fullscreen" title="Fullscreen">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+              </button>
+              <button class="cell-btn" data-cell-change type="button" aria-label="Change channel" title="Change">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+              </button>
+              <button class="cell-btn" data-cell-remove type="button" aria-label="Remove channel" title="Remove">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+    <p class="mosaic-hint">Tip: only one pane plays sound at a time. Tap a pane or its speaker icon to move the audio there.</p>
+  </section>
+
+  <!-- Channel picker -->
+  <div class="picker" data-picker hidden role="dialog" aria-modal="true" aria-label="Choose a channel">
+    <div class="picker-box">
+      <header class="picker-head">
+        <div class="player-search">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>
+          </svg>
+          <input type="search" data-picker-search placeholder="Search channels…" autocomplete="off" />
+        </div>
+        <button class="modal-icon-btn" data-picker-close type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+        </button>
+      </header>
+      <div class="picker-results stations view-grid" data-picker-results></div>
+    </div>
+  </div>
+
+  <script>
+    import '../scripts/mosaic.ts';
+  </script>
+</Base>

@@ -1,0 +1,106 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ChannelCard from '../../components/ChannelCard.astro';
+import { getChannelsByCategory, type Channel } from '../../lib/iptv';
+import { categoryBySlug, CATEGORIES } from '../../lib/seo-data';
+
+export const prerender = false;
+
+const SITE_URL = 'https://worldtvchannels.org';
+const { slug = '' } = Astro.params;
+const def = categoryBySlug(slug);
+const name = def?.name ?? (slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : 'Channels');
+
+let channels: Channel[] = [];
+try {
+  channels = await getChannelsByCategory(name);
+} catch { /* graceful */ }
+
+if (!def && channels.length === 0) {
+  Astro.response.status = 404;
+}
+
+const total = channels.length;
+const shown = channels.slice(0, 60);
+const intro = def?.intro ??
+  `Browse live ${name} channels from broadcasters around the world and watch them free in your browser.`;
+const related = CATEGORIES.filter((c) => c.slug !== slug).slice(0, 8);
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: `${name} TV channels`,
+    description: def?.blurb ?? intro,
+    inLanguage: 'en',
+    url: `${SITE_URL}/category/${slug}`,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Categories', item: `${SITE_URL}/category` },
+      { '@type': 'ListItem', position: 3, name: name },
+    ],
+  },
+  ...(shown.length
+    ? [{
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        numberOfItems: shown.length,
+        itemListElement: shown.map((c, i) => ({ '@type': 'ListItem', position: i + 1, name: c.name })),
+      }]
+    : []),
+];
+---
+<Base
+  title={`Watch ${name} TV Channels Live Online — Free | World TV Channels`}
+  description={def?.blurb ?? `Watch live ${name} TV channels from around the world, free in your browser. ${total} channels available.`}
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Categories', href: '/category' },
+    { label: name },
+  ]} />
+
+  <section class="container landing">
+    <div class="landing-head">
+      <h1>Watch {name} channels live</h1>
+      <p class="landing-intro">{intro}</p>
+      <div class="hero-ctas" style="justify-content:flex-start;">
+        <a class="cta" href={`/?category=${slug}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Open {name} in the player
+        </a>
+      </div>
+      {total > 0 && <p class="landing-count">{total.toLocaleString('en')} live {name.toLowerCase()} channels available right now.</p>}
+    </div>
+
+    {shown.length > 0 ? (
+      <div class="stations view-grid landing-grid">
+        {shown.map((c) => <ChannelCard channel={c} />)}
+      </div>
+    ) : (
+      <p class="empty">Channels are loading or temporarily unavailable. <a href={`/?category=${slug}`}>Open the player</a> to try again.</p>
+    )}
+
+    {total > shown.length && (
+      <p style="text-align:center;margin-top:1.5rem;">
+        <a class="cta cta-secondary" href={`/?category=${slug}`}>See all {total.toLocaleString('en')} {name.toLowerCase()} channels →</a>
+      </p>
+    )}
+
+    <div class="landing-related">
+      <h2>Other categories</h2>
+      <div class="facet-grid">
+        {related.map((c) => (
+          <a class="facet-card" href={`/category/${c.slug}`}><span class="facet-name">{c.name}</span></a>
+        ))}
+      </div>
+      <p style="margin-top:1.5rem;"><a class="link-arrow" href="/country">Browse channels by country →</a></p>
+    </div>
+  </section>
+</Base>

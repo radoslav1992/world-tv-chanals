@@ -1,0 +1,54 @@
+---
+import Base from '../../layouts/Base.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { getDataset } from '../../lib/iptv';
+import { TOP_COUNTRIES } from '../../lib/seo-data';
+
+export const prerender = false;
+
+const SITE_URL = 'https://worldtvchannels.org';
+
+let facets: { id: string; name: string; count: number; flag?: string }[] = [];
+try {
+  const ds = await getDataset();
+  facets = ds.countries;
+} catch { /* graceful */ }
+
+const items = facets.length
+  ? facets.map((f) => ({ code: f.id.toLowerCase(), name: f.name, count: f.count, flag: f.flag || '' }))
+  : TOP_COUNTRIES.map((c) => ({ code: c.code.toLowerCase(), name: c.name, count: 0, flag: '' }));
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'TV channels by country',
+  description: 'Browse live TV channels by country — watch television from the US, UK, Europe and around the world.',
+  inLanguage: 'en',
+  url: `${SITE_URL}/country`,
+};
+---
+<Base
+  title="Browse TV channels by country — World TV Channels"
+  description="Browse thousands of live TV channels by country — watch television from the US, UK, Europe and around the world, free online."
+  jsonLd={jsonLd}
+>
+  <Breadcrumbs crumbs={[{ label: 'Home', href: '/' }, { label: 'Countries' }]} />
+
+  <section class="container blog-index">
+    <div class="section-head">
+      <h1>TV channels by country</h1>
+      <p>Pick a country to explore its live TV channels — then watch instantly in your browser.</p>
+    </div>
+
+    <div class="facet-grid">
+      {items.map((c) => (
+        <a class="facet-card" href={`/country/${c.code}`}>
+          <span class="facet-name">{c.flag ? `${c.flag} ` : ''}{c.name}</span>
+          {c.count > 0 && <span class="facet-count">{c.count.toLocaleString('en')} channels</span>}
+        </a>
+      ))}
+    </div>
+
+    <p style="margin-top:2rem;"><a class="link-arrow" href="/category">Browse by category →</a></p>
+  </section>
+</Base>
