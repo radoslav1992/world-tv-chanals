@@ -2,7 +2,7 @@ import { getCollection } from 'astro:content';
 
 export const prerender = true;
 
-const SITE = 'https://worldtvchannels.org';
+const SITE = 'https://worldtvchannels.com';
 
 function esc(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]!));

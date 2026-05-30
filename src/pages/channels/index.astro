@@ -6,7 +6,7 @@ import { getCollection } from 'astro:content';
 const channels = (await getCollection('channels'))
   .sort((a, b) => a.data.name.localeCompare(b.data.name, 'en'));
 
-const SITE_URL = 'https://worldtvchannels.org';
+const SITE_URL = 'https://worldtvchannels.com';
 
 const jsonLd = [
   {
