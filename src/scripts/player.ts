@@ -70,8 +70,16 @@ class Player {
   private viewButtons: NodeListOf<HTMLButtonElement>;
   private view: View = 'grid';
   private cards = new Map<string, HTMLElement>();
-  private categoryContainer: HTMLElement | null = null;
-  private countryContainer: HTMLElement | null = null;
+
+  // Filter dropdowns (browse mode)
+  private filterBar: HTMLElement | null = null;
+  private categoryFacets: Facet[] = [];
+  private countryFacets: Facet[] = [];
+  private randomBtn: HTMLButtonElement | null = null;
+  private resetBtn: HTMLButtonElement | null = null;
+
+  // Stream load watchdog
+  private loadTimer: ReturnType<typeof setTimeout> | null = null;
 
   // Sleep timer
   private sleepTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -108,6 +116,8 @@ class Player {
   private tvOverlayText: HTMLElement;
   private tvSpinner: HTMLElement | null;
   private tvRetry: HTMLButtonElement | null;
+  private tvNext: HTMLButtonElement | null;
+  private tvErrorActions: HTMLElement | null;
   private tvUnmute: HTMLButtonElement | null;
   private qualityToggle: HTMLButtonElement | null;
   private qualityLabel: HTMLElement | null;
@@ -159,6 +169,8 @@ class Player {
     this.tvOverlayText = this.modal.querySelector<HTMLElement>('[data-tv-overlay-text]')!;
     this.tvSpinner = this.modal.querySelector<HTMLElement>('[data-tv-spinner]');
     this.tvRetry = this.modal.querySelector<HTMLButtonElement>('[data-tv-retry]');
+    this.tvNext = this.modal.querySelector<HTMLButtonElement>('[data-tv-next]');
+    this.tvErrorActions = this.modal.querySelector<HTMLElement>('[data-tv-error-actions]');
     this.tvUnmute = this.modal.querySelector<HTMLButtonElement>('[data-tv-unmute]');
     this.qualityToggle = this.modal.querySelector<HTMLButtonElement>('[data-quality-toggle]');
     this.qualityLabel = this.modal.querySelector<HTMLElement>('[data-quality-label]');
@@ -195,6 +207,7 @@ class Player {
       if (this.current) toggleFavorite(this.current);
     });
     this.tvRetry?.addEventListener('click', () => this.retry());
+    this.tvNext?.addEventListener('click', () => this.step(1));
     this.tvUnmute?.addEventListener('click', () => this.unmute());
     this.modalPip?.addEventListener('click', () => this.togglePip());
     this.modalCast?.addEventListener('click', () => this.castToDevice());
@@ -226,8 +239,16 @@ class Player {
     if (this.searchEl) {
       this.searchEl.addEventListener('input', () => this.onSearchInput());
     }
-    this.categoryContainer = document.querySelector<HTMLElement>('[data-categories]');
-    this.countryContainer = document.querySelector<HTMLElement>('[data-countries]');
+
+    // Filter dropdowns + actions (browse mode)
+    this.filterBar = document.querySelector<HTMLElement>('[data-filter-bar]');
+    this.randomBtn = document.querySelector<HTMLButtonElement>('[data-random]');
+    this.resetBtn = document.querySelector<HTMLButtonElement>('[data-filter-reset]');
+    this.randomBtn?.addEventListener('click', () => this.playRandom());
+    this.resetBtn?.addEventListener('click', () => this.resetFilters());
+    document.addEventListener('click', (e) => {
+      if (!(e.target as HTMLElement).closest('.filter-select')) this.closeAllFilterPanels();
+    });
 
     // Sleep timer
     const sleepToggle = document.querySelector<HTMLButtonElement>('[data-sleep-toggle]');
@@ -298,43 +319,140 @@ class Player {
   private async loadMeta() {
     try {
       const res = await fetch(API_META);
-      if (!res.ok) return;
-      const data = await res.json();
-      this.buildFacetPills(this.categoryContainer, 'category', 'All categories', data.categories || []);
-      this.buildFacetPills(this.countryContainer, 'country', 'All countries', data.countries || [], true);
+      if (res.ok) {
+        const data = await res.json();
+        this.categoryFacets = data.categories || [];
+        this.countryFacets = data.countries || [];
+      }
     } catch { /* ignore */ }
+    if (this.filterBar) this.filterBar.style.display = '';
+    this.setupFilterSelect('category');
+    this.setupFilterSelect('country');
+    this.updateResetVisibility();
   }
 
-  private buildFacetPills(
-    container: HTMLElement | null,
-    kind: 'category' | 'country',
-    allLabel: string,
-    facets: Facet[],
-    withFlag = false,
-  ) {
-    if (!container || facets.length === 0) return;
-    const active = kind === 'category' ? this.activeCategory : this.activeCountry;
-    const isActive = (val: string) => val.toLowerCase() === active.toLowerCase();
-    container.style.display = '';
-    container.innerHTML =
-      `<button class="genre-pill${isActive('all') ? ' active' : ''}" data-facet="all">${allLabel}</button>` +
-      facets
-        .map((f) => {
-          const label = `${withFlag && f.flag ? f.flag + ' ' : ''}${escapeHtml(f.name)}`;
-          return `<button class="genre-pill${isActive(f.id) ? ' active' : ''}" data-facet="${escapeAttr(f.id)}">${label} <span class="pill-count">${f.count}</span></button>`;
-        })
-        .join('');
-    container.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-facet]');
-      if (!btn) return;
-      const value = btn.dataset.facet || 'all';
-      if (kind === 'category') this.activeCategory = value;
-      else this.activeCountry = value;
-      container.querySelectorAll('.genre-pill').forEach((b) =>
-        b.classList.toggle('active', (b as HTMLElement).dataset.facet === value),
-      );
-      this.loadPage(1);
+  private facetsFor(kind: 'category' | 'country'): Facet[] {
+    return kind === 'category' ? this.categoryFacets : this.countryFacets;
+  }
+  private activeFor(kind: 'category' | 'country'): string {
+    return kind === 'category' ? this.activeCategory : this.activeCountry;
+  }
+  private filterRoot(kind: 'category' | 'country'): HTMLElement | null {
+    return document.querySelector<HTMLElement>(`.filter-select[data-filter="${kind}"]`);
+  }
+
+  private setupFilterSelect(kind: 'category' | 'country') {
+    const root = this.filterRoot(kind);
+    if (!root) return;
+    const trigger = root.querySelector<HTMLButtonElement>('[data-filter-trigger]')!;
+    const panel = root.querySelector<HTMLElement>('[data-filter-panel]')!;
+    const search = root.querySelector<HTMLInputElement>('[data-filter-search]')!;
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = panel.hidden;
+      this.closeAllFilterPanels();
+      if (willOpen) {
+        panel.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        search.value = '';
+        this.renderFilterOptions(kind, '');
+        setTimeout(() => search.focus(), 30);
+      }
     });
+    search.addEventListener('input', () => this.renderFilterOptions(kind, search.value.trim().toLowerCase()));
+    search.addEventListener('click', (e) => e.stopPropagation());
+    this.updateFilterLabel(kind);
+  }
+
+  private closeAllFilterPanels() {
+    document.querySelectorAll<HTMLElement>('.filter-select [data-filter-panel]').forEach((p) => { p.hidden = true; });
+    document.querySelectorAll<HTMLButtonElement>('.filter-select [data-filter-trigger]')
+      .forEach((t) => t.setAttribute('aria-expanded', 'false'));
+  }
+
+  private renderFilterOptions(kind: 'category' | 'country', query: string) {
+    const root = this.filterRoot(kind);
+    if (!root) return;
+    const options = root.querySelector<HTMLElement>('[data-filter-options]')!;
+    const facets = this.facetsFor(kind);
+    const active = this.activeFor(kind);
+    const allLabel = kind === 'category' ? 'All categories' : 'All countries';
+    const matches = query
+      ? facets.filter((f) => f.name.toLowerCase().includes(query) || f.id.toLowerCase().includes(query))
+      : facets;
+
+    const opt = (value: string, label: string, count: number | null, isActive: boolean) =>
+      `<button class="filter-opt${isActive ? ' active' : ''}" type="button" role="option" aria-selected="${isActive}" data-value="${escapeAttr(value)}">` +
+      `<span class="filter-opt-label">${label}</span>` +
+      `${count != null ? `<span class="filter-opt-count">${count.toLocaleString('en')}</span>` : ''}</button>`;
+
+    let html = '';
+    if (!query) html += opt('all', allLabel, null, active.toLowerCase() === 'all');
+    html += matches
+      .map((f) => {
+        const flag = kind === 'country' && f.flag ? f.flag + ' ' : '';
+        return opt(f.id, `${flag}${escapeHtml(f.name)}`, f.count, f.id.toLowerCase() === active.toLowerCase());
+      })
+      .join('');
+    if (matches.length === 0 && query) html = '<p class="filter-empty">No matches</p>';
+    options.innerHTML = html;
+    options.querySelectorAll<HTMLButtonElement>('[data-value]').forEach((b) =>
+      b.addEventListener('click', () => this.selectFilter(kind, b.dataset.value || 'all')),
+    );
+  }
+
+  private selectFilter(kind: 'category' | 'country', value: string) {
+    if (kind === 'category') this.activeCategory = value;
+    else this.activeCountry = value;
+    this.closeAllFilterPanels();
+    this.updateFilterLabel(kind);
+    this.updateResetVisibility();
+    this.loadPage(1);
+  }
+
+  private updateFilterLabel(kind: 'category' | 'country') {
+    const root = this.filterRoot(kind);
+    if (!root) return;
+    const label = root.querySelector<HTMLElement>('[data-filter-label]')!;
+    const trigger = root.querySelector<HTMLButtonElement>('[data-filter-trigger]')!;
+    const active = this.activeFor(kind);
+    const allLabel = kind === 'category' ? 'All categories' : 'All countries';
+    if (active.toLowerCase() === 'all') {
+      label.textContent = allLabel;
+      trigger.classList.remove('has-value');
+      return;
+    }
+    const facet = this.facetsFor(kind).find((f) => f.id.toLowerCase() === active.toLowerCase());
+    label.textContent = facet ? `${kind === 'country' && facet.flag ? facet.flag + ' ' : ''}${facet.name}` : active;
+    trigger.classList.add('has-value');
+  }
+
+  private updateResetVisibility() {
+    const any = this.activeCategory !== 'all' || this.activeCountry !== 'all' || !!this.q;
+    if (this.resetBtn) this.resetBtn.hidden = !any;
+  }
+
+  private resetFilters() {
+    this.activeCategory = 'all';
+    this.activeCountry = 'all';
+    this.q = '';
+    if (this.searchEl) this.searchEl.value = '';
+    this.updateFilterLabel('category');
+    this.updateFilterLabel('country');
+    this.updateResetVisibility();
+    this.loadPage(1);
+  }
+
+  private async playRandom() {
+    const params = new URLSearchParams({ random: '1' });
+    if (this.q) params.set('q', this.q);
+    if (this.activeCategory !== 'all') params.set('category', this.activeCategory);
+    if (this.activeCountry !== 'all') params.set('country', this.activeCountry);
+    try {
+      const res = await fetch(`${API_CHANNELS}?${params.toString()}`);
+      const data: PageResult = await res.json();
+      if (data.items && data.items[0]) this.play(data.items[0]);
+    } catch { /* ignore */ }
   }
 
   private onSearchInput() {
@@ -342,6 +460,7 @@ class Player {
     this.searchDebounce = setTimeout(() => {
       if (this.mode === 'browse') {
         this.q = this.searchEl ? this.searchEl.value.trim() : '';
+        this.updateResetVisibility();
         this.loadPage(1);
       } else {
         this.applyLocalFilter();
@@ -571,10 +690,22 @@ class Player {
     if (this.hls) { this.hls.destroy(); this.hls = null; }
   }
 
+  // If a stream never produces a frame, surface an error instead of spinning forever.
+  private startLoadWatchdog() {
+    this.clearLoadWatchdog();
+    this.loadTimer = setTimeout(() => {
+      if (this.state === 'loading') this.setState('error');
+    }, 14_000);
+  }
+  private clearLoadWatchdog() {
+    if (this.loadTimer) { clearTimeout(this.loadTimer); this.loadTimer = null; }
+  }
+
   private loadStream(url: string) {
     this.destroyHls();
     this.video.removeAttribute('src');
     this.resetQuality();
+    this.startLoadWatchdog();
     this.video.muted = false;
     if (this.tvUnmute) this.tvUnmute.hidden = true;
 
@@ -848,6 +979,7 @@ class Player {
 
   private setState(state: PlayState) {
     this.state = state;
+    if (state !== 'loading') this.clearLoadWatchdog();
     const label =
       state === 'playing' ? 'LIVE'
       : state === 'loading' ? 'Loading…'
@@ -862,16 +994,17 @@ class Player {
     this.npToggle.setAttribute('aria-label', ariaLabel);
     this.modalToggle.setAttribute('aria-label', ariaLabel);
 
-    // TV screen overlay (spinner while loading, retry on error)
+    // TV screen overlay (spinner while loading, retry/next on error)
     this.modal.dataset.state = state;
     if (this.tvSpinner) this.tvSpinner.style.display = state === 'loading' ? '' : 'none';
-    if (this.tvRetry) this.tvRetry.hidden = state !== 'error';
+    if (this.tvErrorActions) this.tvErrorActions.hidden = state !== 'error';
+    if (this.tvNext) this.tvNext.hidden = this.items.length < 2;
     if (state === 'loading') {
       this.tvOverlay.style.display = '';
       this.tvOverlayText.textContent = '';
     } else if (state === 'error') {
       this.tvOverlay.style.display = '';
-      this.tvOverlayText.textContent = 'This stream is currently unavailable.';
+      this.tvOverlayText.textContent = 'This stream is currently unavailable. It may be offline or geo-blocked.';
     } else {
       this.tvOverlay.style.display = 'none';
     }
@@ -921,6 +1054,10 @@ function escapeAttr(s: string) {
 
 const root = document.querySelector<HTMLElement>('[data-player]');
 if (root) {
-  const p = new Player(root);
-  void p.init();
+  try {
+    const p = new Player(root);
+    void p.init();
+  } catch (err) {
+    console.error('Player failed to start', err);
+  }
 }

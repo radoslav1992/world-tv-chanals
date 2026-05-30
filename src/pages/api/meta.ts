@@ -14,8 +14,8 @@ export const GET: APIRoute = async () => {
     return new Response(
       JSON.stringify({
         total: channels.length,
-        categories: categories.slice(0, 24),
-        countries: countries.slice(0, 30),
+        categories,
+        countries,
       }),
       { headers: HEADERS },
     );

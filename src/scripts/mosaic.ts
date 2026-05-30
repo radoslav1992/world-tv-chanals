@@ -271,4 +271,10 @@ function escapeAttr(s: string) {
 }
 
 const grid = document.querySelector<HTMLElement>('[data-mosaic]');
-if (grid) new Mosaic(grid);
+if (grid) {
+  try {
+    new Mosaic(grid);
+  } catch (err) {
+    console.error('Mosaic failed to start', err);
+  }
+}

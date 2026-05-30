@@ -14,6 +14,8 @@ try {
   facets = ds.countries;
 } catch { /* graceful */ }
 
+Astro.response.headers.set('Cache-Control', 'public, max-age=300, s-maxage=1800');
+
 const items = facets.length
   ? facets.map((f) => ({ code: f.id.toLowerCase(), name: f.name, count: f.count, flag: f.flag || '' }))
   : TOP_COUNTRIES.map((c) => ({ code: c.code.toLowerCase(), name: c.name, count: 0, flag: '' }));

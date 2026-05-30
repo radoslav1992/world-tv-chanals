@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'world-tv-v1';
+const CACHE_VERSION = 'world-tv-v2';
 const APP_SHELL = [
   '/',
   '/logo.png',
@@ -8,63 +8,68 @@ const APP_SHELL = [
   '/manifest.json',
 ];
 
-// Install: pre-cache the app shell
+// Install: pre-cache a minimal app shell (used as an offline fallback).
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_VERSION).then((cache) => cache.addAll(APP_SHELL))
+    caches.open(CACHE_VERSION).then((cache) => cache.addAll(APP_SHELL)).catch(() => {})
   );
   self.skipWaiting();
 });
 
-// Activate: clean up old caches
+// Activate: clean up old caches.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_VERSION)
-          .map((key) => caches.delete(key))
-      )
+      Promise.all(keys.filter((key) => key !== CACHE_VERSION).map((key) => caches.delete(key)))
     )
   );
   self.clients.claim();
 });
 
-// Fetch: network-first for API/audio, cache-first for static assets
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
+  const accept = request.headers.get('accept') || '';
 
-  // Network-only for API calls, media streams, and non-GET requests.
-  // Never cache cross-origin HLS playlists/segments or our channel API.
+  // Bypass the SW entirely for non-GET, cross-origin, API and media. Letting the
+  // browser handle media natively preserves HLS range requests and live streams.
   if (
     request.method !== 'GET' ||
     url.origin !== self.location.origin ||
     url.pathname.startsWith('/api') ||
-    request.url.includes('stream') ||
-    request.headers.get('accept')?.includes('video') ||
+    accept.includes('video') ||
     url.pathname.endsWith('.m3u8') ||
     url.pathname.endsWith('.ts') ||
     url.pathname.endsWith('.mp4')
   ) {
-    event.respondWith(fetch(request));
     return;
   }
 
-  // Cache-first for static assets
+  // Navigations (HTML pages, incl. dynamic SSR routes): network-first so content
+  // is always fresh; fall back to cache, then the offline home page.
+  if (request.mode === 'navigate' || accept.includes('text/html')) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_VERSION).then((c) => c.put(request, clone)).catch(() => {});
+          }
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match('/')))
+    );
+    return;
+  }
+
+  // Static assets (hashed JS/CSS, images, fonts): cache-first, then network.
   event.respondWith(
     caches.match(request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
+      if (cached) return cached;
       return fetch(request).then((response) => {
-        // Only cache successful same-origin responses
-        if (
-          response.ok &&
-          url.origin === self.location.origin
-        ) {
+        if (response.ok) {
           const clone = response.clone();
-          caches.open(CACHE_VERSION).then((cache) => cache.put(request, clone));
+          caches.open(CACHE_VERSION).then((c) => c.put(request, clone)).catch(() => {});
         }
         return response;
       });
