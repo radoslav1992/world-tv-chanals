@@ -7,7 +7,7 @@ import { categoryBySlug, CATEGORIES } from '../../lib/seo-data';
 
 export const prerender = false;
 
-const SITE_URL = 'https://worldtvchannels.org';
+const SITE_URL = 'https://worldtvchannels.com';
 const { slug = '' } = Astro.params;
 const def = categoryBySlug(slug);
 const name = def?.name ?? (slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : 'Channels');

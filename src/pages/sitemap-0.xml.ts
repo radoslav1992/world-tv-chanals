@@ -3,7 +3,7 @@ import { CATEGORIES, TOP_COUNTRIES } from '../lib/seo-data';
 
 export const prerender = true;
 
-const SITE = 'https://worldtvchannels.org';
+const SITE = 'https://worldtvchannels.com';
 
 const staticPages = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },

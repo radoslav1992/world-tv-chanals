@@ -1,6 +1,6 @@
 export const prerender = true;
 
-const SITE = 'https://worldtvchannels.org';
+const SITE = 'https://worldtvchannels.com';
 
 export function GET() {
   const body = `<?xml version="1.0" encoding="UTF-8"?>
