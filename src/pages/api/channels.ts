@@ -51,6 +51,16 @@ export const GET: APIRoute = async ({ url }) => {
     }
 
     const total = list.length;
+
+    // Random pick from the filtered set (used by the "Random channel" button).
+    if (url.searchParams.get('random') && total > 0) {
+      const pick = list[Math.floor(Math.random() * total)];
+      return new Response(
+        JSON.stringify({ items: [pick], total, page: 1, totalPages: 1, limit: 1 }),
+        { headers: { ...HEADERS, 'Cache-Control': 'no-store' } },
+      );
+    }
+
     const totalPages = Math.max(1, Math.ceil(total / limit));
     const safePage = Math.min(page, totalPages);
     const start = (safePage - 1) * limit;
